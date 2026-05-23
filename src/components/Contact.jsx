@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
+import { API_BASE_URL } from '../config/constants';
 import 'react-datepicker/dist/react-datepicker.css';
 
 export default function Contact({ theme }) {
@@ -29,7 +30,7 @@ export default function Contact({ theme }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const resPkg = await fetch('http://localhost:5000/api/packages');
+        const resPkg = await fetch(`${API_BASE_URL}/api/packages`);
         if (resPkg.ok) {
           const data = await resPkg.json();
           const filtered = data.filter(pkg => pkg.theme === theme);
@@ -39,7 +40,7 @@ export default function Contact({ theme }) {
           }
         }
         
-        const resSet = await fetch('http://localhost:5000/api/settings');
+        const resSet = await fetch(`${API_BASE_URL}/api/settings`);
         if (resSet.ok) {
           const settingsData = await resSet.json();
           if (settingsData.whatsapp_number) {
@@ -117,7 +118,7 @@ export default function Contact({ theme }) {
     const encodedText = encodeURIComponent(waText);
 
     try {
-      await fetch('http://localhost:5000/api/bookings', {
+      await fetch(`${API_BASE_URL}/api/bookings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

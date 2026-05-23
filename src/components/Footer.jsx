@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/constants';
 
 export default function Footer({ theme }) {
   const isSport = theme === 'sport';
@@ -7,7 +8,7 @@ export default function Footer({ theme }) {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/settings');
+        const res = await fetch(`${API_BASE_URL}/api/settings`);
         if (res.ok) {
           const data = await res.json();
           if (data.instagram_username) {

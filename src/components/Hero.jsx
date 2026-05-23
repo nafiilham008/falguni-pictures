@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAssetUrl } from '../config/constants';
+import { getAssetUrl, API_BASE_URL } from '../config/constants';
 
 export default function Hero({ theme }) {
   const isSport = theme === 'sport';
@@ -8,7 +8,7 @@ export default function Hero({ theme }) {
   useEffect(() => {
     const loadHeroImage = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/settings');
+        const res = await fetch(`${API_BASE_URL}/api/settings`);
         if (res.ok) {
           const data = await res.json();
           if (isSport) {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Users, Eye, Image as ImageIcon, TrendingUp } from 'lucide-react';
+import { API_BASE_URL } from '../config/constants';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -16,7 +17,7 @@ export default function Dashboard() {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('falguni_admin_token');
-        const resStats = await fetch('http://localhost:5000/api/analytics/stats', {
+        const resStats = await fetch(`${API_BASE_URL}/api/analytics/stats`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

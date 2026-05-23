@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/constants';
 
 export default function Pricing({ theme }) {
   const isSport = theme === 'sport';
@@ -18,7 +19,7 @@ export default function Pricing({ theme }) {
   useEffect(() => {
     const fetchPackages = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/packages');
+        const res = await fetch(`${API_BASE_URL}/api/packages`);
         if (res.ok) {
           const data = await res.json();
           // Filter by theme

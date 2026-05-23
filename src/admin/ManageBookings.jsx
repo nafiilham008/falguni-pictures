@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Trash2, Calendar, Search, ArrowUpDown } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { API_BASE_URL } from '../config/constants';
 import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
@@ -16,7 +17,7 @@ export default function ManageBookings() {
   const fetchBookings = async () => {
     try {
       const token = localStorage.getItem('falguni_admin_token');
-      const res = await fetch('http://localhost:5000/api/bookings', {
+      const res = await fetch(`${API_BASE_URL}/api/bookings`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -51,7 +52,7 @@ export default function ManageBookings() {
     
     try {
       const token = localStorage.getItem('falguni_admin_token');
-      await fetch(`http://localhost:5000/api/bookings/${id}`, {
+      await fetch(`${API_BASE_URL}/api/bookings/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -67,7 +68,7 @@ export default function ManageBookings() {
     const newStatus = booking.status === 'approved' ? 'pending' : 'approved';
     try {
       const token = localStorage.getItem('falguni_admin_token');
-      const res = await fetch(`http://localhost:5000/api/bookings/${booking.id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/bookings/${booking.id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

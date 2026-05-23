@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config/constants';
 
 export default function Testimonials({ theme }) {
   const isSport = theme === 'sport';
@@ -8,7 +9,7 @@ export default function Testimonials({ theme }) {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/testimonials');
+        const res = await fetch(`${API_BASE_URL}/api/testimonials`);
         if (res.ok) {
           const data = await res.json();
           setTestimonials(data);

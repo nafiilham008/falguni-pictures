@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Image as ImageIcon, LogOut, Package, MessageSquareQuote, CalendarCheck, Settings as SettingsIcon, Home, Search, Loader2 } from 'lucide-react';
-import { getAssetUrl } from '../config/constants';
+import { getAssetUrl, API_BASE_URL } from '../config/constants';
 
 export default function AdminLayout() {
   const location = useLocation();
@@ -28,7 +28,7 @@ export default function AdminLayout() {
         setIsSearching(true);
         try {
           const token = localStorage.getItem('falguni_admin_token');
-          const res = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(searchQuery)}`, {
+          const res = await fetch(`${API_BASE_URL}/api/search?q=${encodeURIComponent(searchQuery)}`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (res.ok) {

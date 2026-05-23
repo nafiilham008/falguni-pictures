@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Save, Lock, Smartphone, Image as ImageIcon, UploadCloud, Loader2 } from 'lucide-react';
-import { getAssetUrl } from '../config/constants';
+import { getAssetUrl, API_BASE_URL } from '../config/constants';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
@@ -49,7 +49,7 @@ export default function Settings() {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/settings');
+      const res = await fetch(`${API_BASE_URL}/api/settings`);
       if (res.ok) {
         const data = await res.json();
         if (data.whatsapp_number) setWaNumber(data.whatsapp_number);
@@ -77,7 +77,7 @@ export default function Settings() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('falguni_admin_token');
-      const res = await fetch('http://localhost:5000/api/settings', {
+      const res = await fetch(`${API_BASE_URL}/api/settings`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -101,7 +101,7 @@ export default function Settings() {
   const handleSaveVisuals = async () => {
     try {
       const token = localStorage.getItem('falguni_admin_token');
-      const res = await fetch('http://localhost:5000/api/settings', {
+      const res = await fetch(`${API_BASE_URL}/api/settings`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ export default function Settings() {
 
     try {
       const token = localStorage.getItem('falguni_admin_token');
-      const res = await fetch('http://localhost:5000/api/upload', {
+      const res = await fetch(`${API_BASE_URL}/api/upload`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData,
@@ -168,7 +168,7 @@ export default function Settings() {
     }
     try {
       const token = localStorage.getItem('falguni_admin_token');
-      const res = await fetch('http://localhost:5000/api/admin/password', {
+      const res = await fetch(`${API_BASE_URL}/api/admin/password`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',

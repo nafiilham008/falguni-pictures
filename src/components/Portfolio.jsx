@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAssetUrl } from '../config/constants';
+import { getAssetUrl, API_BASE_URL } from '../config/constants';
 import Lightbox from './Lightbox';
 
 const CATEGORY_LABELS = {
@@ -25,7 +25,7 @@ export default function Portfolio({ theme }) {
     const fetchPortfolio = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`http://localhost:5000/api/events?theme=${theme}`);
+        const res = await fetch(`${API_BASE_URL}/api/events?theme=${theme}`);
         if (res.ok) {
           const apiData = await res.json();
           const transformed = apiData.map(ev => ({
@@ -49,8 +49,8 @@ export default function Portfolio({ theme }) {
     const fetchMeta = async () => {
       try {
         const [settingsRes, categoriesRes] = await Promise.all([
-          fetch('http://localhost:5000/api/settings'),
-          fetch('http://localhost:5000/api/portrait-categories'),
+          fetch(`${API_BASE_URL}/api/settings`),
+          fetch(`${API_BASE_URL}/api/portrait-categories`),
         ]);
         if (settingsRes.ok) {
           const s = await settingsRes.json();
@@ -80,7 +80,7 @@ export default function Portfolio({ theme }) {
   const handleEventClick = async (event) => {
     setActiveEvent(event);
     try {
-      await fetch('http://localhost:5000/api/analytics', {
+      await fetch(`${API_BASE_URL}/api/analytics`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit2, Star, Search, ArrowUpDown } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { API_BASE_URL } from '../config/constants';
 import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
@@ -23,7 +24,7 @@ export default function ManageTestimonials() {
 
   const fetchTestimonials = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/testimonials');
+      const res = await fetch(`${API_BASE_URL}/api/testimonials`);
       if (res.ok) {
         const data = await res.json();
         setTestimonials(data);
@@ -45,7 +46,7 @@ export default function ManageTestimonials() {
       const token = localStorage.getItem('falguni_admin_token');
       const payload = { client_name: clientName, role, review, rating };
       
-      let url = 'http://localhost:5000/api/testimonials';
+      let url = `${API_BASE_URL}/api/testimonials`;
       let method = 'POST';
       
       if (editingId) {
@@ -106,7 +107,7 @@ export default function ManageTestimonials() {
     
     try {
       const token = localStorage.getItem('falguni_admin_token');
-      await fetch(`http://localhost:5000/api/testimonials/${id}`, {
+      await fetch(`${API_BASE_URL}/api/testimonials/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

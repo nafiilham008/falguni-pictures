@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Trash2, Edit2, UploadCloud, Loader2, Image as ImageIcon, X, Star, Search, ArrowUpDown } from 'lucide-react';
-import { getAssetUrl } from '../config/constants';
+import { getAssetUrl, API_BASE_URL } from '../config/constants';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
@@ -38,7 +38,7 @@ export default function ManagePortfolio() {
 
   const fetchEvents = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/events');
+      const res = await fetch(`${API_BASE_URL}/api/events`);
       if (res.ok) {
         const data = await res.json();
         setEvents(data);
@@ -70,7 +70,7 @@ export default function ManagePortfolio() {
 
       try {
         const token = localStorage.getItem('falguni_admin_token');
-        const res = await fetch('http://localhost:5000/api/upload', {
+        const res = await fetch(`${API_BASE_URL}/api/upload`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -107,7 +107,7 @@ export default function ManagePortfolio() {
       let res;
       if (editingId) {
         // Edit mode (Update)
-        res = await fetch(`http://localhost:5000/api/events/${editingId}`, {
+        res = await fetch(`${API_BASE_URL}/api/events/${editingId}`, {
           method: 'PUT',
           headers: { 
             'Content-Type': 'application/json',
@@ -118,7 +118,7 @@ export default function ManagePortfolio() {
         
         // Append new uploaded files
         if (uploadedFiles.length > 0) {
-          await fetch(`http://localhost:5000/api/events/${editingId}/images`, {
+          await fetch(`${API_BASE_URL}/api/events/${editingId}/images`, {
             method: 'POST',
             headers: { 
               'Content-Type': 'application/json',
@@ -133,7 +133,7 @@ export default function ManagePortfolio() {
           alert("Please provide at least one image.");
           return;
         }
-        res = await fetch('http://localhost:5000/api/events', {
+        res = await fetch(`${API_BASE_URL}/api/events`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -199,7 +199,7 @@ export default function ManagePortfolio() {
 
     try {
       const token = localStorage.getItem('falguni_admin_token');
-      const res = await fetch(`http://localhost:5000/api/events/${editingId}/images/${imageId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/events/${editingId}/images/${imageId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -216,7 +216,7 @@ export default function ManagePortfolio() {
   const handleSetExistingCover = async (imageId) => {
     try {
       const token = localStorage.getItem('falguni_admin_token');
-      const res = await fetch(`http://localhost:5000/api/events/${editingId}/images/${imageId}/cover`, {
+      const res = await fetch(`${API_BASE_URL}/api/events/${editingId}/images/${imageId}/cover`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -235,7 +235,7 @@ export default function ManagePortfolio() {
   const handleDeleteNewUpload = async (fileKey, idx) => {
     try {
       const token = localStorage.getItem('falguni_admin_token');
-      await fetch(`http://localhost:5000/api/upload`, {
+      await fetch(`${API_BASE_URL}/api/upload`, {
         method: 'DELETE',
         headers: { 
           'Content-Type': 'application/json',
@@ -279,7 +279,7 @@ export default function ManagePortfolio() {
     
     try {
       const token = localStorage.getItem('falguni_admin_token');
-      await fetch(`http://localhost:5000/api/events/${id}`, {
+      await fetch(`${API_BASE_URL}/api/events/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

@@ -19,6 +19,7 @@ import ManageBookings from './admin/ManageBookings';
 import Settings from './admin/Settings';
 import Login from './admin/Login';
 import ProtectedRoute from './admin/ProtectedRoute';
+import { API_BASE_URL } from './config/constants';
 
 // Create a component for the main website to wrap existing logic
 function MainWebsite() {
@@ -46,7 +47,7 @@ function MainWebsite() {
     // Only track if not in dev mode (optional) or just track everything for now
     const trackVisitor = async () => {
       try {
-        await fetch('http://localhost:5000/api/analytics', {
+        await fetch(`${API_BASE_URL}/api/analytics`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

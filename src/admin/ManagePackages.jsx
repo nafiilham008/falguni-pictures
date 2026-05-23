@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit2, Search, ArrowUpDown } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { API_BASE_URL } from '../config/constants';
 import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
@@ -24,7 +25,7 @@ export default function ManagePackages() {
 
   const fetchPackages = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/packages');
+      const res = await fetch(`${API_BASE_URL}/api/packages`);
       if (res.ok) {
         const data = await res.json();
         setPackages(data);
@@ -90,7 +91,7 @@ export default function ManagePackages() {
         is_popular: isPopular 
       };
       
-      let url = 'http://localhost:5000/api/packages';
+      let url = `${API_BASE_URL}/api/packages`;
       let method = 'POST';
       
       if (editingId) {
@@ -153,7 +154,7 @@ export default function ManagePackages() {
     
     try {
       const token = localStorage.getItem('falguni_admin_token');
-      await fetch(`http://localhost:5000/api/packages/${id}`, {
+      await fetch(`${API_BASE_URL}/api/packages/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
