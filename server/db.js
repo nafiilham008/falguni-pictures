@@ -22,6 +22,10 @@ if (isProduction || (process.env.DB_HOST && process.env.DB_HOST !== 'localhost' 
 
 const pool = new Pool(poolConfig);
 
+pool.on('connect', (client) => {
+  client.query('SET search_path TO public');
+});
+
 pool.on('error', (err, client) => {
   console.error('Unexpected error on idle client', err);
   process.exit(-1);
