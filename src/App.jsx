@@ -23,24 +23,50 @@ import { API_BASE_URL } from './config/constants';
 
 // Create a component for the main website to wrap existing logic
 function MainWebsite() {
-  const [theme, setTheme] = useState(() => {
-    // Gunakan localStorage alih-alih URL params agar URL tetap bersih
-    return localStorage.getItem('falguni_theme') || 'sport';
-  });
+  const [theme, setTheme] = useState('sport');
+  const [isInitializing, setIsInitializing] = useState(true);
 
   const location = useLocation();
-
   const isFirstMount = useRef(true);
+
+  // Initialize theme from localStorage or DB
+  useEffect(() => {
+    const initTheme = async () => {
+      try {
+        const cached = localStorage.getItem('falguni_theme');
+        if (cached) {
+          setTheme(cached);
+          setIsInitializing(false);
+          return;
+        }
+        
+        // No cached theme, fetch default from DB
+        const res = await fetch(`${API_BASE_URL}/api/settings`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.default_theme) {
+            setTheme(data.default_theme);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch initial theme", err);
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+    initTheme();
+  }, []);
 
   // Simpan tema ke localStorage setiap kali berubah dan scroll ke atas
   useEffect(() => {
+    if (isInitializing) return;
     localStorage.setItem('falguni_theme', theme);
     if (isFirstMount.current) {
       isFirstMount.current = false;
       return;
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [theme]);
+  }, [theme, isInitializing]);
 
   // Visitor Tracking
   useEffect(() => {
@@ -77,6 +103,14 @@ function MainWebsite() {
   }, [theme]);
 
   const isSport = theme === 'sport';
+
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-slate-700 border-t-white rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">

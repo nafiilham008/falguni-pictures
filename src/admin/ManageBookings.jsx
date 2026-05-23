@@ -137,8 +137,9 @@ export default function ManageBookings() {
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left border-collapse min-w-[900px]">
+            <thead>
             <tr className="bg-slate-50 border-b border-gray-100 text-sm text-slate-500 font-semibold tracking-wider uppercase">
               <th className="p-4 pl-6 cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleSort('client_name')}>
                 <div className="flex items-center space-x-1"><span>Client Name</span><ArrowUpDown size={14} /></div>
@@ -178,8 +179,10 @@ export default function ManageBookings() {
                     <span>{b.event_date ? new Date(b.event_date).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' }) : '-'}</span>
                   </div>
                 </td>
-                <td className="p-4 text-sm text-slate-600 max-w-xs truncate" title={b.message}>
-                  {b.message || '-'}
+                <td className="p-4 text-sm text-slate-600 w-48 md:w-64">
+                  <div className="max-w-[200px] md:max-w-[250px] whitespace-normal break-words" title={b.message}>
+                    {b.message || '-'}
+                  </div>
                 </td>
                 <td className="p-4 text-sm text-slate-600">
                   {b.location || <span className="text-slate-300">-</span>}
@@ -207,8 +210,9 @@ export default function ManageBookings() {
                 </td>
               </tr>
             ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
         
         {/* Pagination */}
         {totalPages > 1 && (

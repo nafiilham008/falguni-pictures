@@ -28,6 +28,7 @@ export default function Settings() {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   // Spotlight & Visuals Settings
+  const [defaultTheme, setDefaultTheme] = useState('sport');
   const [portraitSpotlight, setPortraitSpotlight] = useState('wisuda');
   const [visuals, setVisuals] = useState({
     hero_image_sport: '',
@@ -54,6 +55,7 @@ export default function Settings() {
         const data = await res.json();
         if (data.whatsapp_number) setWaNumber(data.whatsapp_number);
         if (data.instagram_username) setInstagramUsername(data.instagram_username);
+        if (data.default_theme) setDefaultTheme(data.default_theme);
         if (data.portrait_spotlight) setPortraitSpotlight(data.portrait_spotlight);
         setVisuals(prev => ({
           ...prev,
@@ -108,6 +110,7 @@ export default function Settings() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ 
+          default_theme: defaultTheme,
           portrait_spotlight: portraitSpotlight,
           ...visuals
         })
@@ -322,6 +325,22 @@ export default function Settings() {
           {activeTab === 'visuals' && (
             <div className="space-y-8">
               <h3 className="text-xl font-bold text-slate-900 border-b pb-4">Spotlight & Visuals</h3>
+
+              {/* Default Theme Section */}
+              <div className="bg-slate-50 rounded-2xl p-6 border border-gray-100">
+                <div className="mb-2">
+                  <label className="block text-sm font-bold text-slate-700 mb-2">Default Landing Theme</label>
+                  <p className="text-xs text-slate-500 mb-3">Which theme should visitors see first when they open your website?</p>
+                  <select
+                    value={defaultTheme}
+                    onChange={e => setDefaultTheme(e.target.value)}
+                    className="w-full md:w-auto px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-shadow outline-none font-semibold text-slate-800 bg-white"
+                  >
+                    <option value="sport">Sport</option>
+                    <option value="portrait">Portrait</option>
+                  </select>
+                </div>
+              </div>
 
               {/* Sport Section */}
               <div className="bg-slate-50 rounded-2xl p-6">

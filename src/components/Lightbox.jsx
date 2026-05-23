@@ -6,26 +6,29 @@ export default function Lightbox({ isOpen, event, theme, onClose }) {
 
   return (
     <div 
-      className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flexflex-col items-center justify-center p-4 md:p-10 transition-opacity duration-300"
-      onClick={onClose}
+      className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center p-4 md:p-10 transition-opacity duration-300"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <button 
-        className="absolute top-6 right-6 text-white hover:text-red-500 text-5xl z-[110] transition-colors font-sans"
+        className="absolute top-4 right-4 md:top-6 md:right-6 text-white hover:text-red-500 text-5xl z-[110] transition-colors font-sans w-12 h-12 flex items-center justify-center bg-black/30 md:bg-transparent rounded-full"
         onClick={onClose}
       >
         &times;
       </button>
 
       <div 
-        className="w-full h-full max-w-6xl mx-auto flex flex-col pt-12 relative"
-        onClick={e => e.stopPropagation()}
+        className="w-full h-full max-w-6xl mx-auto flex flex-col pt-20 md:pt-12 relative"
+        onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       >
-        <h2 className={`text-center text-2xl md:text-4xl text-white mb-6 sticky top-0 bg-black/50 py-2 z-10 ${isSport ? 'font-black uppercase tracking-widest' : 'font-serif italic'}`}>
+        <h2 className={`text-center text-xl md:text-4xl text-white mb-4 md:mb-6 sticky top-0 bg-black/80 md:bg-black/50 py-3 z-10 rounded-xl md:rounded-none ${isSport ? 'font-black uppercase tracking-widest' : 'font-serif italic'}`}>
           {event.title}
         </h2>
         
         {/* Scrollable Container */}
-        <div className="flex-1 overflow-y-auto w-full no-scrollbar flex flex-col items-center gap-8 pb-10">
+        <div 
+          className="flex-1 overflow-y-auto w-full no-scrollbar flex flex-col items-center gap-8 pb-10"
+          onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+        >
           {event.images.map((src, idx) => {
             const isVid = src.toLowerCase().endsWith('.mp4');
             if (isVid) {

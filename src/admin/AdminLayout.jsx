@@ -10,7 +10,10 @@ export default function AdminLayout() {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const searchRef = useRef(null);
+
+  const toggleMobileSidebar = () => setIsMobileSidebarOpen(!isMobileSidebarOpen);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -68,9 +71,30 @@ export default function AdminLayout() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex font-sans text-slate-800">
+    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row font-sans text-slate-800">
+      
+      {/* Mobile Top Bar */}
+      <div className="md:hidden flex items-center justify-between h-16 bg-white border-b border-gray-200 px-4 sticky top-0 z-30">
+        <Link to="/dashboard" className="flex items-center space-x-2">
+          <img src={getAssetUrl('assets/media/logo-transparent.png')} alt="Logo" className="h-8 w-8 object-contain" />
+          <span className="font-black uppercase tracking-widest text-slate-800">Falguni</span>
+        </Link>
+        <button onClick={toggleMobileSidebar} className="text-slate-600 p-2">
+          {isMobileSidebarOpen ? (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          ) : (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          )}
+        </button>
+      </div>
+
+      {/* Sidebar Overlay for Mobile */}
+      {isMobileSidebarOpen && (
+        <div className="md:hidden fixed inset-0 z-40 bg-black/50" onClick={toggleMobileSidebar}></div>
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col fixed h-full z-10">
+      <aside className={`w-64 bg-white border-r border-gray-200 flex flex-col fixed h-full z-50 transition-transform duration-300 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="h-20 flex items-center px-6 border-b border-gray-100">
           <Link to="/dashboard" className="flex items-center space-x-3 text-slate-900 hover:opacity-80 transition-opacity w-full">
             <img
@@ -91,6 +115,7 @@ export default function AdminLayout() {
               <Link
                 key={item.name}
                 to={item.path}
+                onClick={() => setIsMobileSidebarOpen(false)}
                 className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-colors ${isActive
                     ? 'bg-slate-900 text-white shadow-md'
                     : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
@@ -124,7 +149,7 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 flex flex-col min-h-screen">
+      <main className="flex-1 md:ml-64 flex flex-col min-h-screen">
         {/* Top Navbar for Global Search */}
         <header className="h-20 bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-10 flex items-center px-8 justify-between">
           <div className="flex-1 max-w-xl relative" ref={searchRef}>
@@ -180,7 +205,7 @@ export default function AdminLayout() {
           </div>
         </header>
 
-        <div className="p-8 max-w-5xl mx-auto w-full flex-1">
+        <div className="p-4 md:p-8 max-w-5xl mx-auto w-full flex-1 overflow-x-hidden">
           <Outlet />
         </div>
       </main>

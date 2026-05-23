@@ -33,10 +33,10 @@ export default function Hero({ theme }) {
       };
 
   return (
-    <section id="home" className="h-screen relative flex items-center justify-center pt-20 overflow-hidden">
+    <section id="home" className="min-h-[85vh] md:min-h-screen relative flex items-center justify-center pt-20 overflow-hidden">
       <div className={`absolute inset-0 transition-theme opacity-30 ${isSport ? 'bg-black' : 'bg-transparent'}`}></div>
       <div 
-        className="absolute inset-0 transition-opacity duration-1000 bg-center bg-cover bg-no-repeat" 
+        className="absolute inset-0 transition-opacity duration-1000 bg-[center_20%] md:bg-center bg-cover bg-no-repeat" 
         style={bgStyle}
       ></div>
       
