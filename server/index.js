@@ -19,9 +19,10 @@ app.use(cors());
 app.use(express.json());
 
 // Media Proxy Route to bypass Internet Positif blocking for CF R2 .r2.dev domains
-app.get('/api/media/*', async (req, res) => {
+app.get('/api/media/{*key}', async (req, res) => {
     try {
-        const fileKey = req.params[0];
+        const keyParam = req.params.key;
+        const fileKey = Array.isArray(keyParam) ? keyParam.join('/') : keyParam;
         if (!fileKey) {
             return res.status(400).send('Missing file key');
         }
@@ -47,7 +48,9 @@ app.get('/api/media/*', async (req, res) => {
         // Stream body to client
         response.Body.pipe(res);
     } catch (err) {
-        console.error(`Failed to fetch media proxy for key ${req.params[0]}:`, err.message);
+        const keyParam = req.params.key;
+        const fileKey = Array.isArray(keyParam) ? keyParam.join('/') : keyParam;
+        console.error(`Failed to fetch media proxy for key ${fileKey}:`, err.message);
         res.status(404).send('Media not found');
     }
 });
