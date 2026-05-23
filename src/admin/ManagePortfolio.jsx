@@ -360,8 +360,9 @@ export default function ManagePortfolio() {
 
       {/* List Table */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left border-collapse min-w-[800px]">
+            <thead>
             <tr className="bg-slate-50 border-b border-gray-100 text-sm text-slate-500 font-semibold tracking-wider uppercase">
               <th className="p-4 pl-6 cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleSort('title')}>
                 <div className="flex items-center space-x-1"><span>Event Title</span><ArrowUpDown size={14} /></div>
@@ -405,7 +406,8 @@ export default function ManagePortfolio() {
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
 
         {/* Pagination */}
         {totalPages > 1 && (
