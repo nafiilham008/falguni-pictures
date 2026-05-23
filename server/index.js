@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const multer = require('multer');
-const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const sharp = require('sharp');
@@ -17,6 +17,40 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Media Proxy Route to bypass Internet Positif blocking for CF R2 .r2.dev domains
+app.get('/api/media/*', async (req, res) => {
+    try {
+        const fileKey = req.params[0];
+        if (!fileKey) {
+            return res.status(400).send('Missing file key');
+        }
+
+        const getParams = {
+            Bucket: process.env.R2_BUCKET_NAME,
+            Key: fileKey,
+        };
+
+        const response = await s3Client.send(new GetObjectCommand(getParams));
+
+        // Set Content-Type and Content-Length
+        if (response.ContentType) {
+            res.setHeader('Content-Type', response.ContentType);
+        }
+        if (response.ContentLength) {
+            res.setHeader('Content-Length', response.ContentLength);
+        }
+
+        // Cache for 1 year (static media assets are immutable)
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+
+        // Stream body to client
+        response.Body.pipe(res);
+    } catch (err) {
+        console.error(`Failed to fetch media proxy for key ${req.params[0]}:`, err.message);
+        res.status(404).send('Media not found');
+    }
+});
 
 // R2 Configuration
 const s3Client = new S3Client({
