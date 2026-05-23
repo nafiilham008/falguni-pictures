@@ -701,6 +701,31 @@ app.get('/api/health', (req, res) => {
     res.send('Backend API is running!');
 });
 
+app.get('/api/debug-db', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT NOW()');
+        res.json({ success: true, time: result.rows[0].now, env: {
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            database: process.env.DB_NAME,
+            port: process.env.DB_PORT,
+            hasPassword: !!process.env.DB_PASSWORD,
+            nodeEnv: process.env.NODE_ENV,
+            vercel: process.env.VERCEL
+        } });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message, stack: err.stack, env: {
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            database: process.env.DB_NAME,
+            port: process.env.DB_PORT,
+            hasPassword: !!process.env.DB_PASSWORD,
+            nodeEnv: process.env.NODE_ENV,
+            vercel: process.env.VERCEL
+        } });
+    }
+});
+
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
     app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
