@@ -404,8 +404,9 @@ export default function ManagePackages() {
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-shadow outline-none"
                     >
                       <option value="wedding">Wedding</option>
-                      <option value="graduation">Wisuda / Graduation</option>
-                      <option value="prewedding">Pre-Wedding</option>
+                      <option value="wisuda">Wisuda / Graduation</option>
+                      <option value="prewed">Pre-Wedding</option>
+                      <option value="engagement">Engagement / Lamaran</option>
                       <option value="sport">Sport / Event</option>
                       <option value="custom">Custom & Special Events</option>
                     </select>

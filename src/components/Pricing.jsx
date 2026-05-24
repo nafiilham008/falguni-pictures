@@ -7,9 +7,18 @@ export default function Pricing({ theme }) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('All');
 
+  const CATEGORY_LABELS = {
+    wisuda: 'Graduation',
+    wedding: 'Wedding',
+    prewed: 'Prewedding',
+    engagement: 'Engagement',
+    custom: 'Custom & Special Events',
+    sport: 'Sport / Event'
+  };
+
   const toTitleCase = (str) => {
     if (!str) return '';
-    return str
+    return CATEGORY_LABELS[str] || str
       .split(' ')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
@@ -18,21 +27,35 @@ export default function Pricing({ theme }) {
   useEffect(() => {
     const fetchPackages = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/packages`);
-        if (res.ok) {
-          const data = await res.json();
+        const [pkgsRes, settingsRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/packages`),
+          !isSport ? fetch(`${API_BASE_URL}/api/settings`) : Promise.resolve(null)
+        ]);
+
+        if (pkgsRes.ok) {
+          const data = await pkgsRes.json();
           // Filter by theme
           const themePackages = data.filter(pkg => pkg.theme === theme);
           setPackages(themePackages);
           
-          // Set default active tab synced with spotlight (popular package)
+          let defaultTab = null;
+          if (!isSport && settingsRes && settingsRes.ok) {
+             const settings = await settingsRes.json();
+             defaultTab = settings.portrait_spotlight;
+          }
+          
+          // Set default active tab
           const uniqueCats = [...new Set(themePackages.map(p => p.category).filter(Boolean))];
           if (uniqueCats.length > 0) {
-            const popularPkg = themePackages.find(p => p.is_popular);
-            if (popularPkg && popularPkg.category) {
-              setActiveTab(popularPkg.category);
+            if (defaultTab && uniqueCats.includes(defaultTab)) {
+              setActiveTab(defaultTab);
             } else {
-              setActiveTab(uniqueCats[0]);
+              const popularPkg = themePackages.find(p => p.is_popular);
+              if (popularPkg && popularPkg.category) {
+                setActiveTab(popularPkg.category);
+              } else {
+                setActiveTab(uniqueCats[0]);
+              }
             }
           }
         }
