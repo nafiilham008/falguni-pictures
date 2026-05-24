@@ -125,12 +125,22 @@ export default function ReviewForm() {
     );
   }
 
+  const isDarkTheme = bookingData?.booking_theme === 'sport';
+  const mainBg = isDarkTheme ? 'bg-slate-950' : 'bg-slate-50';
+  const cardBg = isDarkTheme ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-100';
+  const textLabel = isDarkTheme ? 'text-slate-300' : 'text-slate-700';
+  const textTitle = isDarkTheme ? 'text-white' : 'text-slate-900';
+  const inputBg = isDarkTheme ? 'bg-slate-800 border-slate-700 text-white focus:border-white focus:ring-white/20' : 'bg-white border-slate-200 text-slate-900 focus:border-slate-900 focus:ring-slate-900/10';
+  const dashBg = isDarkTheme ? 'border-slate-700 bg-slate-800/50 hover:bg-slate-800' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-50';
+
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-      <div className="max-w-xl w-full bg-white rounded-[2rem] shadow-2xl border border-gray-100 overflow-hidden">
-        <div className="bg-slate-900 px-8 py-10 text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 rounded-full bg-slate-800 opacity-50"></div>
-          <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-slate-800 opacity-50"></div>
+    <div className={`min-h-screen ${mainBg} flex flex-col lg:flex-row`}>
+      {/* Left Side: The Form */}
+      <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 lg:p-12 relative z-10">
+        <div className={`max-w-xl w-full ${cardBg} rounded-[2rem] shadow-2xl border overflow-hidden`}>
+          <div className="bg-slate-900 px-8 py-10 text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 rounded-full bg-slate-800 opacity-50"></div>
+            <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-slate-800 opacity-50"></div>
           
           <h1 className="text-3xl sm:text-4xl font-black text-white mb-2 relative z-10">How did we do?</h1>
           <p className="text-slate-300 relative z-10">
@@ -160,21 +170,21 @@ export default function ReviewForm() {
 
             {/* Review Text */}
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Your Review</label>
+              <label className={`block text-sm font-bold ${textLabel} mb-2`}>Your Review</label>
               <textarea
                 value={review}
                 onChange={(e) => setReview(e.target.value)}
                 required
-                className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 transition-all outline-none resize-none h-32"
+                className={`w-full px-5 py-4 rounded-2xl border transition-all outline-none resize-none h-32 ${inputBg}`}
                 placeholder="Tell us what you liked (or what we can improve)..."
               ></textarea>
             </div>
 
             {/* Image Upload */}
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Share a Photo (Optional)</label>
+              <label className={`block text-sm font-bold ${textLabel} mb-2`}>Share a Photo (Optional)</label>
               <div 
-                className={`border-2 border-dashed rounded-2xl transition-colors relative overflow-hidden group ${preview ? 'border-slate-300 bg-slate-50' : 'border-slate-200 hover:border-slate-400 bg-slate-50/50 hover:bg-slate-50'}`}
+                className={`border-2 border-dashed rounded-2xl transition-colors relative overflow-hidden group ${preview ? (isDarkTheme ? 'border-slate-600 bg-slate-800' : 'border-slate-300 bg-slate-50') : dashBg}`}
               >
                 <input 
                   type="file" 
@@ -206,7 +216,7 @@ export default function ReviewForm() {
             <button
               type="submit"
               disabled={submitting || !review.trim()}
-              className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 focus:ring-4 focus:ring-slate-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-slate-900/20"
+              className={`w-full ${isDarkTheme ? 'bg-white text-slate-900 hover:bg-gray-100' : 'bg-slate-900 text-white hover:bg-slate-800'} py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl`}
             >
               {submitting ? (
                 <>
@@ -221,10 +231,12 @@ export default function ReviewForm() {
           </form>
         </div>
       </div>
-      
-      {/* Show existing testimonials below the form as requested */}
-      <div className="mt-16 w-full">
-        <Testimonials theme="wedding" />
+
+      {/* Right Side: Existing Testimonials Showcase */}
+      <div className={`flex-1 overflow-hidden relative flex flex-col justify-center ${isDarkTheme ? 'bg-slate-900/50 border-l border-slate-800' : 'bg-slate-100/50 border-l border-gray-200'}`}>
+        <div className="w-full max-h-screen overflow-y-auto py-12 lg:py-0">
+          <Testimonials theme={bookingData?.booking_theme || 'wedding'} />
+        </div>
       </div>
     </div>
   );

@@ -413,7 +413,7 @@ app.get('/api/testimonials/review/:token', async (req, res) => {
     try {
         const { token } = req.params;
         const result = await pool.query(`
-            SELECT t.id, t.client_name, b.event as booking_event, t.review
+            SELECT t.id, t.client_name, b.event as booking_event, b.theme_ref as booking_theme, t.review
             FROM testimonials t
             LEFT JOIN bookings b ON t.booking_id = b.id
             WHERE t.token = $1
@@ -467,8 +467,8 @@ app.post('/api/testimonials/submit', upload.single('image'), async (req, res) =>
 
         // Add Notification
         await pool.query(
-            'INSERT INTO notifications (type, message, is_read) VALUES ($1, $2, $3)',
-            ['testimonial', `New testimonial received from ${client_name || tst.client_name}`, false]
+            'INSERT INTO notifications (title, type, message, is_read) VALUES ($1, $2, $3, $4)',
+            ['New Testimonial', 'testimonial', `New testimonial received from ${client_name || tst.client_name}`, false]
         );
 
         res.json({ success: true, testimonial: updateRes.rows[0] });
