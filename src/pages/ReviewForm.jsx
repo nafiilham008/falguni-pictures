@@ -125,10 +125,10 @@ export default function ReviewForm() {
     );
   }
 
-  const isDarkTheme = bookingData?.booking_theme?.toLowerCase() === 'sport' || bookingData?.booking_event?.toLowerCase().includes('sport');
+  const isDarkTheme = bookingData?.booking_theme?.toLowerCase() === 'sport';
   const mainBg = isDarkTheme ? 'bg-gradient-to-br from-slate-950 via-slate-900 to-black' : 'bg-gradient-to-br from-rose-50 via-white to-slate-50';
   const cardBg = isDarkTheme ? 'bg-slate-900/80 border-slate-800 backdrop-blur-md' : 'bg-white/80 border-rose-100 backdrop-blur-md shadow-rose-100';
-  const textLabel = isDarkTheme ? 'text-slate-300' : 'text-slate-700';
+  const textLabel = isDarkTheme ? 'text-white' : 'text-slate-700';
   const textTitle = isDarkTheme ? 'text-white' : 'text-slate-900';
   const inputBg = isDarkTheme ? 'bg-slate-800 border-slate-700 text-white focus:border-white focus:ring-white/20' : 'bg-white border-slate-200 text-slate-900 focus:border-slate-900 focus:ring-slate-900/10';
   const dashBg = isDarkTheme ? 'border-slate-700 bg-slate-800/50 hover:bg-slate-800' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-50';
@@ -153,7 +153,7 @@ export default function ReviewForm() {
             
             {/* Star Rating */}
             <div className="flex flex-col items-center">
-              <label className={`text-sm font-bold uppercase tracking-widest mb-4 ${isDarkTheme ? 'text-slate-400' : 'text-slate-500'}`}>Rate Your Experience</label>
+              <label className={`text-sm font-bold uppercase tracking-widest mb-4 ${isDarkTheme ? 'text-white' : 'text-slate-500'}`}>Rate Your Experience</label>
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -236,7 +236,7 @@ export default function ReviewForm() {
       {/* Right Side: Existing Testimonials Showcase */}
       <div className={`flex-1 overflow-hidden relative flex flex-col justify-center ${isDarkTheme ? 'bg-slate-900/50 border-l border-slate-800' : 'bg-slate-100/50 border-l border-gray-200'}`}>
         <div className="w-full max-h-screen overflow-y-auto py-12 lg:py-0">
-          <Testimonials theme={bookingData?.booking_theme || 'wedding'} layout="masonry" />
+          <Testimonials theme={isDarkTheme ? 'sport' : 'portrait'} layout="masonry" />
         </div>
       </div>
     </div>

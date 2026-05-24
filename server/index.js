@@ -348,9 +348,10 @@ app.delete('/api/packages/:id', verifyToken, async (req, res) => {
 app.get('/api/testimonials', async (req, res) => {
     try {
         const result = await pool.query(`
-            SELECT t.*, b.theme_ref as booking_theme 
+            SELECT t.*, b.event as booking_event, COALESCE(p.theme, b.theme_ref) as booking_theme 
             FROM testimonials t
             LEFT JOIN bookings b ON t.booking_id = b.id
+            LEFT JOIN packages p ON b.event = p.name
             WHERE t.is_approved = true AND t.review IS NOT NULL 
             ORDER BY t.id DESC
         `);
@@ -419,9 +420,10 @@ app.get('/api/testimonials/review/:token', async (req, res) => {
     try {
         const { token } = req.params;
         const result = await pool.query(`
-            SELECT t.id, t.client_name, b.event as booking_event, b.theme_ref as booking_theme, t.review
+            SELECT t.id, t.client_name, b.event as booking_event, COALESCE(p.theme, b.theme_ref) as booking_theme, t.review
             FROM testimonials t
             LEFT JOIN bookings b ON t.booking_id = b.id
+            LEFT JOIN packages p ON b.event = p.name
             WHERE t.token = $1
         `, [token]);
         

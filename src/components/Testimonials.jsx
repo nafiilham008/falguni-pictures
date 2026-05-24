@@ -25,7 +25,6 @@ export default function Testimonials({ theme, layout = 'marquee' }) {
 
   const filteredTestimonials = testimonials.filter(t => {
     const isSportTheme = t.booking_theme?.toLowerCase() === 'sport' 
-      || t.booking_event?.toLowerCase().includes('sport') 
       || t.role?.toLowerCase().includes('sport');
       
     if (isSport) return isSportTheme || (!t.booking_theme && !isSportTheme && !t.role?.toLowerCase().includes('wedding'));
