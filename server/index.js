@@ -66,9 +66,14 @@ const s3Client = new S3Client({
 });
 
 // Multer Setup (in-memory storage)
-const upload = multer({ 
+const uploadAdmin = multer({ 
     storage: multer.memoryStorage(),
-    limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
+    limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit for admin
+});
+
+const uploadTestimonial = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit for testimonials
 });
 
 // --- Admin Initialization & Migrations ---
@@ -443,7 +448,7 @@ app.get('/api/testimonials/review/:token', async (req, res) => {
 
 
 // Public: Submit a review with image
-app.post('/api/testimonials/submit', upload.single('image'), async (req, res) => {
+app.post('/api/testimonials/submit', uploadTestimonial.single('image'), async (req, res) => {
     try {
         const { token, review, rating, role, client_name } = req.body;
         
@@ -719,7 +724,7 @@ app.delete('/api/events/:eventId/images/:imageId', verifyToken, async (req, res)
 });
 
 // 3. Upload API (Protected)
-app.post('/api/upload', verifyToken, upload.single('file'), async (req, res) => {
+app.post('/api/upload', verifyToken, uploadAdmin.single('file'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
