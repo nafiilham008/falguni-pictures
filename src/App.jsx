@@ -16,6 +16,7 @@ import ManagePortfolio from './admin/ManagePortfolio';
 import ManagePackages from './admin/ManagePackages';
 import ManageTestimonials from './admin/ManageTestimonials';
 import ManageBookings from './admin/ManageBookings';
+import Notifications from './admin/Notifications';
 import Settings from './admin/Settings';
 import Login from './admin/Login';
 import ProtectedRoute from './admin/ProtectedRoute';
@@ -159,6 +160,7 @@ function App() {
             <Route path="packages" element={<ManagePackages />} />
             <Route path="testimonials" element={<ManageTestimonials />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
         </Route>
       </Routes>

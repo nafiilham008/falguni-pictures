@@ -68,10 +68,24 @@ const s3Client = new S3Client({
 // Multer Setup (in-memory storage)
 const upload = multer({ storage: multer.memoryStorage() });
 
-// --- Admin Initialization ---
-// Ensures there is at least one admin user
-async function initializeAdmin() {
+// --- Admin Initialization & Migrations ---
+// Ensures tables exist and there is at least one admin user
+async function initializeDatabase() {
     try {
+        // Run migrations
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS notifications (
+                id SERIAL PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                message TEXT NOT NULL,
+                type VARCHAR(50) DEFAULT 'info',
+                is_read BOOLEAN DEFAULT FALSE,
+                link VARCHAR(255),
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
+        // Init admin
         const res = await pool.query("SELECT * FROM admin_users WHERE username = 'admin'");
         if (res.rows.length === 0) {
             const hashedPassword = await bcrypt.hash('admin123', 10);
@@ -82,10 +96,10 @@ async function initializeAdmin() {
             console.log('✅ Default admin account created (admin / admin123)');
         }
     } catch (err) {
-        console.error('Failed to initialize admin account:', err.message);
+        console.error('Failed to initialize database/admin:', err.message);
     }
 }
-initializeAdmin();
+initializeDatabase();
 
 // Routes Placeholder
 
@@ -400,7 +414,15 @@ app.post('/api/bookings', async (req, res) => {
             'INSERT INTO bookings (client_name, event, event_date, message, location, theme_ref, instagram) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
             [client_name, event, event_date, message, location || null, theme_ref || null, instagram || null]
         );
-        res.status(201).json(result.rows[0]);
+        
+        // Create Notification
+        const newBooking = result.rows[0];
+        await pool.query(
+            "INSERT INTO notifications (title, message, type, link) VALUES ($1, $2, $3, $4)",
+            ['New Booking Received', `New booking from ${client_name} for ${event}.`, 'booking', '/dashboard/bookings']
+        );
+
+        res.status(201).json(newBooking);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -427,6 +449,75 @@ app.put('/api/bookings/:id/status', verifyToken, async (req, res) => {
             [status, id]
         );
         res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+app.get('/api/bookings/approved', verifyToken, async (req, res) => {
+    try {
+        const result = await pool.query("SELECT * FROM bookings WHERE status = 'approved' ORDER BY event_date ASC");
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// ==========================================
+// 6.5 NOTIFICATIONS API
+// ==========================================
+app.get('/api/notifications', verifyToken, async (req, res) => {
+    try {
+        // Evaluate upcoming approved bookings to generate reminders
+        const upcomingBookings = await pool.query(`
+            SELECT * FROM bookings 
+            WHERE status = 'approved' 
+            AND event_date >= CURRENT_DATE 
+            AND event_date < CURRENT_DATE + INTERVAL '2 days'
+        `);
+        
+        for (let b of upcomingBookings.rows) {
+            const isToday = new Date(b.event_date).toDateString() === new Date().toDateString();
+            const reminderTitle = isToday ? 'Booking Today!' : 'Booking Tomorrow!';
+            const reminderMsg = `${b.client_name} - ${b.event} is ${isToday ? 'happening today' : 'coming up tomorrow'}!`;
+            
+            const check = await pool.query(
+                "SELECT * FROM notifications WHERE link = $1 AND title = $2",
+                [`/dashboard/bookings?id=${b.id}`, reminderTitle]
+            );
+            if (check.rows.length === 0) {
+                await pool.query(
+                    "INSERT INTO notifications (title, message, type, link) VALUES ($1, $2, $3, $4)",
+                    [reminderTitle, reminderMsg, 'reminder', `/dashboard/bookings?id=${b.id}`]
+                );
+            }
+        }
+
+        const result = await pool.query('SELECT * FROM notifications ORDER BY created_at DESC');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+app.put('/api/notifications/:id/read', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        await pool.query('UPDATE notifications SET is_read = TRUE WHERE id = $1', [id]);
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+app.put('/api/notifications/read-all', verifyToken, async (req, res) => {
+    try {
+        await pool.query('UPDATE notifications SET is_read = TRUE');
+        res.json({ success: true });
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');

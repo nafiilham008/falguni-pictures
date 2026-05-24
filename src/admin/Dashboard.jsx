@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Users, Eye, Image as ImageIcon, TrendingUp } from 'lucide-react';
+import { Users, Eye, Image as ImageIcon, TrendingUp, Calendar as CalendarIcon } from 'lucide-react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { API_BASE_URL } from '../config/constants';
 
 export default function Dashboard() {
@@ -11,6 +13,7 @@ export default function Dashboard() {
     topContent: []
   });
   
+  const [approvedBookings, setApprovedBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,8 +30,17 @@ export default function Dashboard() {
           setStats(dataStats);
         }
 
+        const resBookings = await fetch(`${API_BASE_URL}/api/bookings/approved`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (resBookings.ok) {
+          const dataBookings = await resBookings.json();
+          setApprovedBookings(dataBookings);
+        }
       } catch (err) {
-        console.error("Failed to fetch analytics", err);
+        console.error("Failed to fetch dashboard data", err);
       } finally {
         setLoading(false);
       }
@@ -73,27 +85,68 @@ export default function Dashboard() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 gap-8">
-        {/* Top Popular Content */}
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-          <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center"><TrendingUp className="mr-2 text-rose-500" /> Top Popular Content</h3>
-          {stats.topContent && stats.topContent.length > 0 ? (
-            <ul className="space-y-4">
-              {stats.topContent.map((item, idx) => (
-                <li key={idx} className="flex justify-between items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-sm">{idx + 1}</div>
-                    <span className="font-semibold text-slate-800">{item.title}</span>
-                  </div>
-                  <div className="text-sm font-bold text-slate-600 bg-white px-3 py-1 rounded-full border border-gray-200">{item.views} Views</div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-slate-500 text-center py-8">No content analytics data available yet.</p>
-          )}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Top Popular Content */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+            <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center"><TrendingUp className="mr-2 text-rose-500" /> Top Popular Content</h3>
+            {stats.topContent && stats.topContent.length > 0 ? (
+              <ul className="space-y-4 flex-1">
+                {stats.topContent.map((item, idx) => (
+                  <li key={idx} className="flex justify-between items-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-sm">{idx + 1}</div>
+                      <span className="font-semibold text-slate-800">{item.title}</span>
+                    </div>
+                    <div className="text-sm font-bold text-slate-600 bg-white px-3 py-1 rounded-full border border-gray-200">{item.views} Views</div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-slate-500 text-center py-8 flex-1 flex items-center justify-center">No content analytics data available yet.</p>
+            )}
+          </div>
+
+          {/* Calendar of Bookings */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+            <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center"><CalendarIcon className="mr-2 text-blue-500" /> Booking Calendar</h3>
+            <div className="flex-1 flex flex-col items-center justify-center">
+              <style>{`
+                .react-datepicker { font-family: inherit; border: none; width: 100%; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); border-radius: 1rem; overflow: hidden; }
+                .react-datepicker__month-container { width: 100%; padding: 1rem; }
+                .react-datepicker__header { background-color: #f8fafc; border-bottom: 1px solid #f1f5f9; padding-top: 1rem; }
+                .react-datepicker__day-name { color: #64748b; font-weight: 600; width: 2.5rem; }
+                .react-datepicker__day { width: 2.5rem; height: 2.5rem; line-height: 2.5rem; font-weight: 500; color: #334155; border-radius: 9999px; margin: 0.2rem; transition: all 0.2s; }
+                .react-datepicker__day:hover { background-color: #f1f5f9; }
+                .react-datepicker__day--keyboard-selected { background-color: transparent; }
+                .highlighted-date { background-color: #3b82f6 !important; color: white !important; font-weight: bold; box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39); }
+                .highlighted-date:hover { background-color: #2563eb !important; }
+              `}</style>
+              <DatePicker
+                inline
+                readOnly
+                highlightDates={[
+                  {
+                    "react-datepicker__day--highlighted-custom-class highlighted-date": approvedBookings.map(b => new Date(b.event_date))
+                  }
+                ]}
+                renderDayContents={(day, date) => {
+                  const bookingsOnDate = approvedBookings.filter(b => new Date(b.event_date).toDateString() === date.toDateString());
+                  if (bookingsOnDate.length > 0) {
+                    return (
+                      <div title={`${bookingsOnDate.length} booking(s): \n${bookingsOnDate.map(b => '- ' + b.client_name).join('\n')}`}>
+                        {day}
+                      </div>
+                    );
+                  }
+                  return day;
+                }}
+              />
+              <p className="text-xs text-slate-500 mt-6 text-center max-w-sm">
+                Dates highlighted in blue indicate an approved booking. Hover over a highlighted date to see details.
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
     </div>
   );
 }

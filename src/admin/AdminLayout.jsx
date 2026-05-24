@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Image as ImageIcon, LogOut, Package, MessageSquareQuote, CalendarCheck, Settings as SettingsIcon, Home, Search, Loader2 } from 'lucide-react';
+import { LayoutDashboard, Image as ImageIcon, LogOut, Package, MessageSquareQuote, CalendarCheck, Settings as SettingsIcon, Home, Search, Loader2, Bell, Check } from 'lucide-react';
 import { getAssetUrl, API_BASE_URL } from '../config/constants';
 
 export default function AdminLayout() {
@@ -11,7 +11,12 @@ export default function AdminLayout() {
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+
   const searchRef = useRef(null);
+  const notifRef = useRef(null);
 
   const toggleMobileSidebar = () => setIsMobileSidebarOpen(!isMobileSidebarOpen);
 
@@ -20,10 +25,67 @@ export default function AdminLayout() {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowResults(false);
       }
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem('falguni_admin_token');
+      const res = await fetch(`${API_BASE_URL}/api/notifications`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch notifications", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    // Poll every 5 minutes
+    const interval = setInterval(fetchNotifications, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleMarkAsRead = async (id) => {
+    try {
+      const token = localStorage.getItem('falguni_admin_token');
+      const res = await fetch(`${API_BASE_URL}/api/notifications/${id}/read`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+      }
+    } catch (err) {
+      console.error("Failed to mark notification as read", err);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      const token = localStorage.getItem('falguni_admin_token');
+      const res = await fetch(`${API_BASE_URL}/api/notifications/read-all`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      }
+    } catch (err) {
+      console.error("Failed to mark all as read", err);
+    }
+  };
+
+  const unreadCount = notifications.filter(n => !n.is_read).length;
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
@@ -200,6 +262,80 @@ export default function AdminLayout() {
                     !isSearching && <div className="p-6 text-center text-sm font-medium text-slate-500">No results found.</div>
                   )}
                 </div>
+              </div>
+            )}
+          </div>
+
+          {/* Notification Bell */}
+          <div className="relative ml-4" ref={notifRef}>
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative p-2 text-slate-500 hover:text-slate-900 transition-colors focus:outline-none"
+            >
+              <Bell size={24} />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+              )}
+            </button>
+
+            {/* Notification Dropdown */}
+            {showNotifications && (
+              <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden z-50 flex flex-col">
+                <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-slate-50">
+                  <h3 className="font-bold text-slate-900">Notifications</h3>
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={handleMarkAllAsRead}
+                      className="text-xs font-semibold text-slate-500 hover:text-blue-600 flex items-center gap-1 transition-colors"
+                    >
+                      <Check size={14} /> Mark all read
+                    </button>
+                  )}
+                </div>
+                
+                <div className="max-h-80 overflow-y-auto">
+                  {notifications.length > 0 ? (
+                    <div className="divide-y divide-gray-50">
+                      {notifications.slice(0, 5).map((notif) => (
+                        <div
+                          key={notif.id}
+                          className={`p-4 transition-colors ${notif.is_read ? 'bg-white opacity-60' : 'bg-blue-50/30'}`}
+                        >
+                          <div className="flex justify-between items-start mb-1">
+                            <h4 className={`text-sm ${notif.is_read ? 'font-semibold text-slate-700' : 'font-bold text-slate-900'}`}>{notif.title}</h4>
+                            {!notif.is_read && (
+                              <button onClick={() => handleMarkAsRead(notif.id)} className="text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-100 transition-colors" title="Mark as read">
+                                <span className="w-2 h-2 rounded-full bg-blue-500 block"></span>
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-500 mb-2 leading-relaxed">{notif.message}</p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{new Date(notif.created_at).toLocaleDateString()}</span>
+                            {notif.link && (
+                              <Link to={notif.link} onClick={() => setShowNotifications(false)} className="text-[10px] font-bold text-blue-600 hover:underline">
+                                View Details
+                              </Link>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-8 text-center text-sm font-medium text-slate-500 flex flex-col items-center">
+                      <Bell size={32} className="text-slate-300 mb-2" />
+                      <p>No notifications right now.</p>
+                    </div>
+                  )}
+                </div>
+                
+                <Link
+                  to="/dashboard/notifications"
+                  onClick={() => setShowNotifications(false)}
+                  className="block w-full text-center py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-t border-gray-100 transition-colors"
+                >
+                  View All History
+                </Link>
               </div>
             )}
           </div>

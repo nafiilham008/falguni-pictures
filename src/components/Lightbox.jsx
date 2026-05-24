@@ -1,3 +1,5 @@
+import { X } from 'lucide-react';
+
 export default function Lightbox({ isOpen, event, theme, onClose }) {
   if (!isOpen || !event) return null;
 
@@ -6,14 +8,14 @@ export default function Lightbox({ isOpen, event, theme, onClose }) {
 
   return (
     <div 
-      className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center p-4 md:p-10 transition-opacity duration-300"
+      className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center p-4 md:p-10 transition-opacity duration-300"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <button 
-        className="absolute top-4 right-4 md:top-6 md:right-6 text-white hover:text-red-500 text-5xl z-[110] transition-colors font-sans w-12 h-12 flex items-center justify-center bg-black/30 md:bg-transparent rounded-full"
-        onClick={onClose}
+        className="fixed top-6 right-6 md:top-8 md:right-8 text-white hover:text-red-500 z-[1100] transition-colors w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-black/80 rounded-full backdrop-blur-md border border-white/20 shadow-xl"
+        onClick={(e) => { e.stopPropagation(); onClose(); }}
       >
-        &times;
+        <X size={28} strokeWidth={2.5} />
       </button>
 
       <div 
