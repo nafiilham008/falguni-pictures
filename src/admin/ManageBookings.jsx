@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Trash2, Calendar, Search, ArrowUpDown } from 'lucide-react';
+import { Trash2, Calendar, Search, ArrowUpDown, Link as LinkIcon } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { API_BASE_URL } from '../config/constants';
 import withReactContent from 'sweetalert2-react-content';
@@ -83,6 +83,38 @@ export default function ManageBookings() {
       }
     } catch (err) {
       console.error("Failed to update status", err);
+    }
+  };
+
+  const handleGenerateReviewLink = async (bookingId) => {
+    try {
+      const token = localStorage.getItem('falguni_admin_token');
+      const res = await fetch(`${API_BASE_URL}/api/testimonials/generate-link`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ booking_id: bookingId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        const fullUrl = `${window.location.origin}${data.url}`;
+        await navigator.clipboard.writeText(fullUrl);
+        MySwal.fire({
+          icon: 'success',
+          title: 'Link Copied!',
+          text: 'The review link has been copied to your clipboard. Send it to the client!',
+          timer: 3000,
+          showConfirmButton: false
+        });
+      } else {
+        MySwal.fire('Error', data.error || 'Failed to generate link', 'error');
+      }
+    } catch (err) {
+      console.error("Link generation failed", err);
+      MySwal.fire('Error', 'An error occurred while generating link', 'error');
     }
   };
 
@@ -203,7 +235,12 @@ export default function ManageBookings() {
                     {b.status === 'approved' ? '✓ Approved' : '○ Pending'}
                   </button>
                 </td>
-                <td className="p-4 text-right pr-6">
+                <td className="p-4 text-right pr-6 space-x-2 whitespace-nowrap">
+                  {b.status === 'approved' && (
+                    <button onClick={() => handleGenerateReviewLink(b.id)} className="text-blue-500 hover:text-blue-700 p-2 rounded-lg hover:bg-blue-50 transition-colors" title="Copy Review Link">
+                      <LinkIcon size={18} />
+                    </button>
+                  )}
                   <button onClick={() => handleDelete(b.id)} className="text-red-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors" title="Delete Log">
                     <Trash2 size={18} />
                   </button>

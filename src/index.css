@@ -55,3 +55,44 @@ html { scroll-behavior: smooth; }
 .theme-wedding .react-datepicker__day--selected, .theme-wedding .react-datepicker__day--keyboard-selected { background-color: #0f172a !important; color: #fff !important; border-radius: 1rem; }
 .theme-wedding .react-datepicker__current-month { color: #0f172a; font-style: italic; font-size: 1.1rem; }
 .theme-wedding .react-datepicker__navigation-icon::before { border-color: #0f172a; }
+
+/* Marquee Animation */
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-100% - 2rem)); }
+}
+.animate-marquee {
+  display: flex;
+  min-width: max-content;
+  animation: scroll 30s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+.marquee-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  display: flex;
+  gap: 2rem;
+}
+.marquee-fade-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 100px;
+  background: linear-gradient(to right, var(--bg-color), transparent);
+  z-index: 10;
+  pointer-events: none;
+}
+.marquee-fade-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100px;
+  background: linear-gradient(to left, var(--bg-color), transparent);
+  z-index: 10;
+  pointer-events: none;
+}

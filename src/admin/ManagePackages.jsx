@@ -18,6 +18,7 @@ export default function ManagePackages() {
   // Form State
   const [editingId, setEditingId] = useState(null);
   const [theme, setTheme] = useState('sport');
+  const [category, setCategory] = useState('wedding');
   const [name, setName] = useState('');
   const [tag, setTag] = useState('');
   const [features, setFeatures] = useState(['']);
@@ -88,7 +89,8 @@ export default function ManagePackages() {
         name: formattedName, 
         tag: tag, 
         features: cleanFeatures, 
-        is_popular: isPopular 
+        is_popular: isPopular,
+        category: category 
       };
       
       let url = `${API_BASE_URL}/api/packages`;
@@ -122,6 +124,7 @@ export default function ManagePackages() {
   const openEditModal = (pkg) => {
     setEditingId(pkg.id);
     setTheme(pkg.theme);
+    setCategory(pkg.category || 'wedding');
     setName(pkg.name);
     setTag(pkg.tag || '');
     setFeatures(pkg.features && pkg.features.length ? pkg.features : ['']);
@@ -132,6 +135,7 @@ export default function ManagePackages() {
   const openAddModal = () => {
     setEditingId(null);
     setTheme('sport');
+    setCategory('wedding');
     setName('');
     setTag('');
     setFeatures(['']);
@@ -258,6 +262,9 @@ export default function ManagePackages() {
               <th className="p-4 cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleSort('theme')}>
                 <div className="flex items-center space-x-1"><span>Theme</span><ArrowUpDown size={14} /></div>
               </th>
+              <th className="p-4 cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleSort('category')}>
+                <div className="flex items-center space-x-1"><span>Category</span><ArrowUpDown size={14} /></div>
+              </th>
               <th className="p-4 cursor-pointer hover:bg-slate-100 transition-colors" onClick={() => handleSort('tag')}>
                 <div className="flex items-center space-x-1"><span>Promo Tag</span><ArrowUpDown size={14} /></div>
               </th>
@@ -278,6 +285,11 @@ export default function ManagePackages() {
                 <td className="p-4">
                   <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${pkg.theme === 'sport' ? 'bg-red-100 text-red-600' : 'bg-violet-100 text-violet-600'}`}>
                     {pkg.theme}
+                  </span>
+                </td>
+                <td className="p-4">
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600">
+                    {toTitleCase(pkg.category || 'N/A')}
                   </span>
                 </td>
                 <td className="p-4 font-semibold text-slate-600">
@@ -382,6 +394,20 @@ export default function ManagePackages() {
                     >
                       <option value="sport">Sport</option>
                       <option value="portrait">Portrait</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Category (Tab)</label>
+                    <select 
+                      value={category}
+                      onChange={e => setCategory(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-shadow outline-none"
+                    >
+                      <option value="wedding">Wedding</option>
+                      <option value="graduation">Wisuda / Graduation</option>
+                      <option value="prewedding">Pre-Wedding</option>
+                      <option value="sport">Sport / Event</option>
+                      <option value="custom">Custom & Special Events</option>
                     </select>
                   </div>
                 </div>

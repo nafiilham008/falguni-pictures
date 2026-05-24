@@ -48,10 +48,14 @@ CREATE TABLE IF NOT EXISTS packages (
 
 CREATE TABLE IF NOT EXISTS testimonials (
     id SERIAL PRIMARY KEY,
+    booking_id INTEGER REFERENCES bookings(id) ON DELETE SET NULL,
+    token VARCHAR(100) UNIQUE,
     client_name VARCHAR(255) NOT NULL,
     role VARCHAR(255),
     review TEXT NOT NULL,
     rating INTEGER DEFAULT 5,
+    image_url TEXT,
+    is_approved BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

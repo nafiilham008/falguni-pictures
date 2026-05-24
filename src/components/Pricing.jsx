@@ -5,6 +5,7 @@ export default function Pricing({ theme }) {
   const isSport = theme === 'sport';
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('All');
 
   const toTitleCase = (str) => {
     if (!str) return '';
@@ -13,8 +14,6 @@ export default function Pricing({ theme }) {
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
   };
-
-  // Price formatting is no longer needed since we hide prices for Open Budget
 
   useEffect(() => {
     const fetchPackages = async () => {
@@ -36,6 +35,12 @@ export default function Pricing({ theme }) {
 
   if (loading || packages.length === 0) return null;
 
+  // Extract unique categories for tabs (if any exist)
+  const categories = ['All', ...new Set(packages.map(p => p.category).filter(Boolean))];
+  const filteredPackages = activeTab === 'All' 
+    ? packages 
+    : packages.filter(p => p.category === activeTab);
+
   return (
     <section id="pricing" className="py-24 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -49,8 +54,26 @@ export default function Pricing({ theme }) {
           <div className={`w-24 h-1 mx-auto ${isSport ? 'bg-red-600' : 'bg-slate-300'}`}></div>
         </div>
 
+        {categories.length > 1 && (
+          <div className="flex flex-wrap justify-center gap-2 mb-12">
+            {categories.map((cat, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveTab(cat)}
+                className={`px-6 py-2 rounded-full font-bold text-sm transition-all shadow-sm ${
+                  activeTab === cat
+                    ? (isSport ? 'bg-red-600 text-white shadow-red-500/30' : 'bg-slate-900 text-white shadow-slate-900/30')
+                    : (isSport ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200')
+                }`}
+              >
+                {toTitleCase(cat)}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {packages.map((pkg, idx) => (
+          {filteredPackages.map((pkg, idx) => (
             <div 
               key={pkg.id} 
               className={`relative p-8 rounded-3xl transition-all duration-300 hover:-translate-y-2 ${

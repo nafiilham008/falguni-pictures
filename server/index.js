@@ -19,10 +19,9 @@ app.use(cors());
 app.use(express.json());
 
 // Media Proxy Route to bypass Internet Positif blocking for CF R2 .r2.dev domains
-app.get('/api/media/{*key}', async (req, res) => {
+app.get('/api/media/*', async (req, res) => {
     try {
-        const keyParam = req.params.key;
-        const fileKey = Array.isArray(keyParam) ? keyParam.join('/') : keyParam;
+        const fileKey = req.params[0];
         if (!fileKey) {
             return res.status(400).send('Missing file key');
         }
@@ -303,10 +302,10 @@ app.get('/api/packages', async (req, res) => {
 
 app.post('/api/packages', verifyToken, async (req, res) => {
     try {
-        const { theme, name, tag, features, is_popular } = req.body;
+        const { theme, name, tag, features, is_popular, category } = req.body;
         const result = await pool.query(
-            'INSERT INTO packages (theme, name, tag, features, is_popular) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [theme, name, tag || '', JSON.stringify(features), is_popular || false]
+            'INSERT INTO packages (theme, name, tag, features, is_popular, category) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [theme, name, tag || '', JSON.stringify(features), is_popular || false, category || 'wedding']
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -318,10 +317,10 @@ app.post('/api/packages', verifyToken, async (req, res) => {
 app.put('/api/packages/:id', verifyToken, async (req, res) => {
     try {
         const { id } = req.params;
-        const { theme, name, tag, features, is_popular } = req.body;
+        const { theme, name, tag, features, is_popular, category } = req.body;
         const result = await pool.query(
-            'UPDATE packages SET theme = $1, name = $2, tag = $3, features = $4, is_popular = $5 WHERE id = $6 RETURNING *',
-            [theme, name, tag || '', JSON.stringify(features), is_popular || false, id]
+            'UPDATE packages SET theme = $1, name = $2, tag = $3, features = $4, is_popular = $5, category = $6 WHERE id = $7 RETURNING *',
+            [theme, name, tag || '', JSON.stringify(features), is_popular || false, category || 'wedding', id]
         );
         res.json(result.rows[0]);
     } catch (err) {
@@ -344,9 +343,11 @@ app.delete('/api/packages/:id', verifyToken, async (req, res) => {
 // ==========================================
 // 5. TESTIMONIALS API
 // ==========================================
+
+// Public: Get all approved testimonials
 app.get('/api/testimonials', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM testimonials ORDER BY id DESC');
+        const result = await pool.query('SELECT * FROM testimonials WHERE is_approved = true AND review IS NOT NULL ORDER BY id DESC');
         res.json(result.rows);
     } catch (err) {
         console.error(err.message);
@@ -354,27 +355,138 @@ app.get('/api/testimonials', async (req, res) => {
     }
 });
 
-app.post('/api/testimonials', verifyToken, async (req, res) => {
+// Admin: Get all testimonials (including pending)
+app.get('/api/admin/testimonials', verifyToken, async (req, res) => {
     try {
-        const { client_name, role, review, rating } = req.body;
-        const result = await pool.query(
-            'INSERT INTO testimonials (client_name, role, review, rating) VALUES ($1, $2, $3, $4) RETURNING *',
-            [client_name, role, review, rating || 5]
-        );
-        res.status(201).json(result.rows[0]);
+        const result = await pool.query(`
+            SELECT t.*, b.client_name as booking_client, b.event as booking_event 
+            FROM testimonials t
+            LEFT JOIN bookings b ON t.booking_id = b.id
+            ORDER BY t.id DESC
+        `);
+        res.json(result.rows);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
     }
 });
 
+// Admin: Generate review link for a booking
+app.post('/api/testimonials/generate-link', verifyToken, async (req, res) => {
+    try {
+        const { booking_id } = req.body;
+        const crypto = require('crypto');
+        const token = crypto.randomBytes(16).toString('hex');
+        
+        // Get booking info
+        const bookingRes = await pool.query('SELECT client_name FROM bookings WHERE id = $1', [booking_id]);
+        if (bookingRes.rows.length === 0) return res.status(404).send('Booking not found');
+        
+        const client_name = bookingRes.rows[0].client_name;
+
+        // Check if token already exists for this booking, if so replace or return it
+        const exist = await pool.query('SELECT * FROM testimonials WHERE booking_id = $1', [booking_id]);
+        
+        if (exist.rows.length > 0) {
+            // Already has a row, update token if it doesn't have a review yet
+            if (exist.rows[0].review) {
+                return res.status(400).json({ error: 'Review already submitted for this booking' });
+            }
+            await pool.query('UPDATE testimonials SET token = $1 WHERE id = $2', [token, exist.rows[0].id]);
+        } else {
+            // Create pending testimonial row
+            await pool.query(
+                'INSERT INTO testimonials (booking_id, token, client_name, review) VALUES ($1, $2, $3, $4)',
+                [booking_id, token, client_name, '']
+            );
+        }
+        
+        res.json({ token, url: `/review/${token}` });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Public: Get review context by token
+app.get('/api/testimonials/review/:token', async (req, res) => {
+    try {
+        const { token } = req.params;
+        const result = await pool.query(`
+            SELECT t.id, t.client_name, b.event as booking_event, t.review
+            FROM testimonials t
+            LEFT JOIN bookings b ON t.booking_id = b.id
+            WHERE t.token = $1
+        `, [token]);
+        
+        if (result.rows.length === 0) return res.status(404).json({ error: 'Invalid or expired token' });
+        if (result.rows[0].review && result.rows[0].review.length > 0) return res.status(400).json({ error: 'Review already submitted' });
+        
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Public: Submit a review with image
+app.post('/api/testimonials/submit', upload.single('image'), async (req, res) => {
+    try {
+        const { token, review, rating, role, client_name } = req.body;
+        
+        const tstRes = await pool.query('SELECT * FROM testimonials WHERE token = $1', [token]);
+        if (tstRes.rows.length === 0) return res.status(404).json({ error: 'Invalid token' });
+        
+        const tst = tstRes.rows[0];
+        if (tst.review && tst.review.length > 0) return res.status(400).json({ error: 'Review already submitted' });
+
+        let imageUrl = null;
+        if (req.file) {
+            // Convert to webp
+            const webpBuffer = await sharp(req.file.buffer).webp({ quality: 80 }).toBuffer();
+            const fileName = `assets/media/review_${Date.now()}_${Math.random().toString(36).substring(7)}.webp`;
+            
+            const uploadParams = {
+                Bucket: process.env.R2_BUCKET_NAME,
+                Key: fileName,
+                Body: webpBuffer,
+                ContentType: 'image/webp',
+            };
+            await s3Client.send(new PutObjectCommand(uploadParams));
+            imageUrl = fileName;
+        }
+
+        // Update testimonial
+        const updateRes = await pool.query(
+            `UPDATE testimonials 
+             SET review = $1, rating = $2, role = $3, image_url = $4, token = NULL, client_name = $5
+             WHERE id = $6 RETURNING *`,
+            [review, rating || 5, role || '', imageUrl, client_name || tst.client_name, tst.id]
+        );
+
+        // Add Notification
+        await pool.query(
+            'INSERT INTO notifications (type, message, is_read) VALUES ($1, $2, $3)',
+            ['testimonial', `New testimonial received from ${client_name || tst.client_name}`, false]
+        );
+
+        res.json({ success: true, testimonial: updateRes.rows[0] });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Admin: Approve, Reject, or Edit testimonial
 app.put('/api/testimonials/:id', verifyToken, async (req, res) => {
     try {
         const { id } = req.params;
-        const { client_name, role, review, rating } = req.body;
+        const { client_name, role, review, rating, is_approved } = req.body;
         const result = await pool.query(
-            'UPDATE testimonials SET client_name = $1, role = $2, review = $3, rating = $4 WHERE id = $5 RETURNING *',
-            [client_name, role, review, rating || 5, id]
+            'UPDATE testimonials SET client_name = $1, role = $2, review = $3, rating = $4, is_approved = $5 WHERE id = $6 RETURNING *',
+            [client_name, role, review, rating || 5, is_approved || false, id]
         );
         res.json(result.rows[0]);
     } catch (err) {
@@ -383,9 +495,23 @@ app.put('/api/testimonials/:id', verifyToken, async (req, res) => {
     }
 });
 
+// Admin: Delete Testimonial
 app.delete('/api/testimonials/:id', verifyToken, async (req, res) => {
     try {
         const { id } = req.params;
+        const getRes = await pool.query('SELECT image_url FROM testimonials WHERE id = $1', [id]);
+        
+        if (getRes.rows.length > 0 && getRes.rows[0].image_url) {
+            try {
+                await s3Client.send(new DeleteObjectCommand({
+                    Bucket: process.env.R2_BUCKET_NAME,
+                    Key: getRes.rows[0].image_url,
+                }));
+            } catch (err) {
+                console.error("Failed to delete image from R2:", err.message);
+            }
+        }
+        
         await pool.query('DELETE FROM testimonials WHERE id = $1', [id]);
         res.json({ success: true });
     } catch (err) {
@@ -393,6 +519,7 @@ app.delete('/api/testimonials/:id', verifyToken, async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+
 
 // ==========================================
 // 6. BOOKING LOGS API

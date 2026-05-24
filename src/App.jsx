@@ -8,6 +8,7 @@ import About from './components/About';
 import Testimonials from './components/Testimonials';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import ReviewForm from './pages/ReviewForm';
 
 // Admin Components
 import AdminLayout from './admin/AdminLayout';
@@ -147,6 +148,9 @@ function App() {
       <Routes>
         {/* Main Public Website Route */}
         <Route path="/" element={<MainWebsite />} />
+        
+        {/* Testimonial Submission Form */}
+        <Route path="/review/:token" element={<ReviewForm />} />
         
         {/* Admin Login Route */}
         <Route path="/login" element={<Login />} />
