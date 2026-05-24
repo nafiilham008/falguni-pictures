@@ -3,6 +3,7 @@ import { Plus, Trash2, Edit2, UploadCloud, Loader2, Image as ImageIcon, X, Star,
 import { getAssetUrl, API_BASE_URL } from '../config/constants';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import imageCompression from 'browser-image-compression';
 
 const MySwal = withReactContent(Swal);
 
@@ -65,8 +66,18 @@ export default function ManagePortfolio() {
     setIsUploading(true);
     
     for (const file of files) {
+      let processedFile = file;
+      if (file.type.startsWith('image/')) {
+        try {
+          const options = { maxSizeMB: 2, maxWidthOrHeight: 1920, useWebWorker: true };
+          processedFile = await imageCompression(file, options);
+        } catch (err) {
+          console.error("Compression error:", err);
+        }
+      }
+
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', processedFile, processedFile.name || file.name);
 
       try {
         const token = localStorage.getItem('falguni_admin_token');
