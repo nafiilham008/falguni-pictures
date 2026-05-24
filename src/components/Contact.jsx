@@ -125,9 +125,9 @@ export default function Contact({ theme }) {
           client_name: formData.name,
           event: formData.event,
           event_date: formData.date,
-          message: formData.message,
+          message: formData.message + (formData.themeRef ? `\n\nStyle Reference: ${formData.themeRef}` : ''),
           location: formData.location,
-          theme_ref: formData.themeRef,
+          theme_ref: theme, // Save the global application theme (sport/portrait)
           instagram: formData.instagram
         })
       });
@@ -224,7 +224,7 @@ export default function Contact({ theme }) {
             {/* Row 3: Theme/Reference + Instagram */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className={`block text-xs font-bold mb-2 uppercase tracking-widest ${isSport ? 'text-gray-400' : 'text-slate-500'}`}>Theme / Reference</label>
+                <label className={`block text-xs font-bold mb-2 uppercase tracking-widest ${isSport ? 'text-gray-400' : 'text-slate-500'}`}>Style / Theme Reference</label>
                 <input 
                   type="text" 
                   id="themeRef" 

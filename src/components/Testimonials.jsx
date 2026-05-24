@@ -24,10 +24,12 @@ export default function Testimonials({ theme, layout = 'marquee' }) {
   }, []);
 
   const filteredTestimonials = testimonials.filter(t => {
-    // If no booking_theme, it might be manually added. Show it anyway unless it's clearly for another theme.
-    // For sport, show sport or null. For non-sport, show non-sport or null.
-    if (isSport) return t.booking_theme === 'sport' || !t.booking_theme;
-    return t.booking_theme !== 'sport';
+    const isSportTheme = t.booking_theme?.toLowerCase() === 'sport' 
+      || t.booking_event?.toLowerCase().includes('sport') 
+      || t.role?.toLowerCase().includes('sport');
+      
+    if (isSport) return isSportTheme || (!t.booking_theme && !isSportTheme && !t.role?.toLowerCase().includes('wedding'));
+    return !isSportTheme;
   });
 
   if (loading || filteredTestimonials.length === 0) return null;

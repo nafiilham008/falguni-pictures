@@ -125,7 +125,7 @@ export default function ReviewForm() {
     );
   }
 
-  const isDarkTheme = bookingData?.booking_theme?.toLowerCase() === 'sport';
+  const isDarkTheme = bookingData?.booking_theme?.toLowerCase() === 'sport' || bookingData?.booking_event?.toLowerCase().includes('sport');
   const mainBg = isDarkTheme ? 'bg-gradient-to-br from-slate-950 via-slate-900 to-black' : 'bg-gradient-to-br from-rose-50 via-white to-slate-50';
   const cardBg = isDarkTheme ? 'bg-slate-900/80 border-slate-800 backdrop-blur-md' : 'bg-white/80 border-rose-100 backdrop-blur-md shadow-rose-100';
   const textLabel = isDarkTheme ? 'text-slate-300' : 'text-slate-700';
