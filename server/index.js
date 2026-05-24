@@ -94,24 +94,50 @@ async function initializeDatabase() {
         `);
 
         // ── LEGACY DATA MIGRATION (idempotent — safe to run every startup) ──
-        // Normalize old portrait-category theme values → 'portrait' in events table
+        //
+        // Old schema used 'theme' to store portrait sub-category (e.g. theme='wisuda', theme='prewed').
+        // New schema uses theme='portrait' (or 'sport') + a separate 'category' field.
+        // This migration normalizes old data by:
+        //   1. Reading the old theme value to determine the correct category
+        //   2. Setting category = correct value (if not already set correctly)
+        //   3. Setting theme = 'portrait'
+        //
+        // For EVENTS table:
         await pool.query(`
-            UPDATE events SET theme = 'portrait'
+            UPDATE events SET
+                category = CASE
+                    WHEN theme IN ('wisuda', 'graduation') THEN 'wisuda'
+                    WHEN theme IN ('prewed', 'prewedding') THEN 'prewed'
+                    WHEN theme = 'wedding' THEN 'wedding'
+                    WHEN theme = 'engagement' THEN 'engagement'
+                    WHEN theme IN ('family', 'custom') THEN 'custom'
+                    ELSE category
+                END,
+                theme = 'portrait'
             WHERE theme IN ('wisuda', 'graduation', 'prewed', 'prewedding', 'wedding', 'engagement', 'family', 'custom')
         `);
-        // Normalize old portrait-category theme values → 'portrait' in packages table
+        // For PACKAGES table:
         await pool.query(`
-            UPDATE packages SET theme = 'portrait'
+            UPDATE packages SET
+                category = CASE
+                    WHEN theme IN ('wisuda', 'graduation') THEN 'wisuda'
+                    WHEN theme IN ('prewed', 'prewedding') THEN 'prewed'
+                    WHEN theme = 'wedding' THEN 'wedding'
+                    WHEN theme = 'engagement' THEN 'engagement'
+                    WHEN theme IN ('family', 'custom') THEN 'custom'
+                    ELSE category
+                END,
+                theme = 'portrait'
             WHERE theme IN ('wisuda', 'graduation', 'prewed', 'prewedding', 'wedding', 'engagement', 'family', 'custom')
         `);
-        // Fix old category names (events)
-        await pool.query(`UPDATE events SET category = 'wisuda' WHERE category IN ('graduation')`);
-        await pool.query(`UPDATE events SET category = 'prewed' WHERE category IN ('prewedding')`);
-        await pool.query(`UPDATE events SET category = 'custom' WHERE category IN ('family')`);
-        // Fix old category names (packages)
-        await pool.query(`UPDATE packages SET category = 'wisuda' WHERE category IN ('graduation')`);
-        await pool.query(`UPDATE packages SET category = 'prewed' WHERE category IN ('prewedding')`);
-        await pool.query(`UPDATE packages SET category = 'custom' WHERE category IN ('family')`);
+
+        // Also fix any stray old category name aliases (safe even if already correct)
+        await pool.query(`UPDATE events   SET category = 'wisuda' WHERE category = 'graduation'`);
+        await pool.query(`UPDATE events   SET category = 'prewed' WHERE category = 'prewedding'`);
+        await pool.query(`UPDATE events   SET category = 'custom' WHERE category = 'family'`);
+        await pool.query(`UPDATE packages SET category = 'wisuda' WHERE category = 'graduation'`);
+        await pool.query(`UPDATE packages SET category = 'prewed' WHERE category = 'prewedding'`);
+        await pool.query(`UPDATE packages SET category = 'custom' WHERE category = 'family'`);
         console.log('✅ Legacy data migration completed');
 
         // Init admin
