@@ -69,8 +69,10 @@ export default function ManagePortfolio() {
       let processedFile = file;
       if (file.type.startsWith('image/')) {
         try {
-          const options = { maxSizeMB: 2, maxWidthOrHeight: 1920, useWebWorker: true };
+          console.log("Original size:", file.size / 1024 / 1024, "MB");
+          const options = { maxSizeMB: 2, maxWidthOrHeight: 1920, useWebWorker: false };
           processedFile = await imageCompression(file, options);
+          console.log("Compressed size:", processedFile.size / 1024 / 1024, "MB");
         } catch (err) {
           console.error("Compression error:", err);
         }
