@@ -126,8 +126,8 @@ export default function ReviewForm() {
   }
 
   const isDarkTheme = bookingData?.booking_theme?.toLowerCase() === 'sport';
-  const mainBg = isDarkTheme ? 'bg-slate-950' : 'bg-slate-50';
-  const cardBg = isDarkTheme ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-100';
+  const mainBg = isDarkTheme ? 'bg-gradient-to-br from-slate-950 via-slate-900 to-black' : 'bg-gradient-to-br from-rose-50 via-white to-slate-50';
+  const cardBg = isDarkTheme ? 'bg-slate-900/80 border-slate-800 backdrop-blur-md' : 'bg-white/80 border-rose-100 backdrop-blur-md shadow-rose-100';
   const textLabel = isDarkTheme ? 'text-slate-300' : 'text-slate-700';
   const textTitle = isDarkTheme ? 'text-white' : 'text-slate-900';
   const inputBg = isDarkTheme ? 'bg-slate-800 border-slate-700 text-white focus:border-white focus:ring-white/20' : 'bg-white border-slate-200 text-slate-900 focus:border-slate-900 focus:ring-slate-900/10';
@@ -142,8 +142,8 @@ export default function ReviewForm() {
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 rounded-full bg-slate-800 opacity-50"></div>
             <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-slate-800 opacity-50"></div>
           
-          <h1 className="text-3xl sm:text-4xl font-black text-white mb-2 relative z-10">How did we do?</h1>
-          <p className="text-slate-300 relative z-10">
+          <h1 className={`text-3xl sm:text-4xl mb-2 relative z-10 ${isDarkTheme ? 'font-black text-white uppercase tracking-tight' : 'font-serif italic text-white'}`}>How did we do?</h1>
+          <p className="text-slate-200 relative z-10 font-medium">
             Hi {bookingData?.client_name}, we'd love to hear about your experience with Falguni!
           </p>
         </div>
@@ -153,7 +153,7 @@ export default function ReviewForm() {
             
             {/* Star Rating */}
             <div className="flex flex-col items-center">
-              <label className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Rate Your Experience</label>
+              <label className={`text-sm font-bold uppercase tracking-widest mb-4 ${isDarkTheme ? 'text-slate-400' : 'text-slate-500'}`}>Rate Your Experience</label>
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
