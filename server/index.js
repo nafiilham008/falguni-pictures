@@ -429,7 +429,6 @@ app.get('/api/testimonials/review/:token', async (req, res) => {
     }
 });
 
-const upload = multer({ storage: multer.memoryStorage() });
 
 // Public: Submit a review with image
 app.post('/api/testimonials/submit', upload.single('image'), async (req, res) => {
