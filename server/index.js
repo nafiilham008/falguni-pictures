@@ -93,6 +93,27 @@ async function initializeDatabase() {
             );
         `);
 
+        // ── LEGACY DATA MIGRATION (idempotent — safe to run every startup) ──
+        // Normalize old portrait-category theme values → 'portrait' in events table
+        await pool.query(`
+            UPDATE events SET theme = 'portrait'
+            WHERE theme IN ('wisuda', 'graduation', 'prewed', 'prewedding', 'wedding', 'engagement', 'family', 'custom')
+        `);
+        // Normalize old portrait-category theme values → 'portrait' in packages table
+        await pool.query(`
+            UPDATE packages SET theme = 'portrait'
+            WHERE theme IN ('wisuda', 'graduation', 'prewed', 'prewedding', 'wedding', 'engagement', 'family', 'custom')
+        `);
+        // Fix old category names (events)
+        await pool.query(`UPDATE events SET category = 'wisuda' WHERE category IN ('graduation')`);
+        await pool.query(`UPDATE events SET category = 'prewed' WHERE category IN ('prewedding')`);
+        await pool.query(`UPDATE events SET category = 'custom' WHERE category IN ('family')`);
+        // Fix old category names (packages)
+        await pool.query(`UPDATE packages SET category = 'wisuda' WHERE category IN ('graduation')`);
+        await pool.query(`UPDATE packages SET category = 'prewed' WHERE category IN ('prewedding')`);
+        await pool.query(`UPDATE packages SET category = 'custom' WHERE category IN ('family')`);
+        console.log('✅ Legacy data migration completed');
+
         // Init admin
         const res = await pool.query("SELECT * FROM admin_users WHERE username = 'admin'");
         if (res.rows.length === 0) {
