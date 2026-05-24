@@ -19,7 +19,7 @@ app.use(cors());
 app.use(express.json());
 
 // Media Proxy Route to bypass Internet Positif blocking for CF R2 .r2.dev domains
-app.get('/api/media/*', async (req, res) => {
+app.get(/\/api\/media\/(.*)/, async (req, res) => {
     try {
         const fileKey = req.params[0];
         if (!fileKey) {
