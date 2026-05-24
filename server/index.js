@@ -16,7 +16,8 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Media Proxy Route to bypass Internet Positif blocking for CF R2 .r2.dev domains
 app.get(/^\/api\/(assets\/media\/.*|media\/.*)$/, async (req, res) => {
@@ -65,7 +66,10 @@ const s3Client = new S3Client({
 });
 
 // Multer Setup (in-memory storage)
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
+});
 
 // --- Admin Initialization & Migrations ---
 // Ensures tables exist and there is at least one admin user
