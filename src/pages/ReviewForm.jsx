@@ -231,6 +231,7 @@ export default function ReviewForm() {
           </form>
         </div>
       </div>
+      </div>
 
       {/* Right Side: Existing Testimonials Showcase */}
       <div className={`flex-1 overflow-hidden relative flex flex-col justify-center ${isDarkTheme ? 'bg-slate-900/50 border-l border-slate-800' : 'bg-slate-100/50 border-l border-gray-200'}`}>
