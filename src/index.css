@@ -64,7 +64,7 @@ html { scroll-behavior: smooth; }
 .animate-marquee {
   display: flex;
   min-width: max-content;
-  animation: scroll 30s linear infinite;
+  animation: scroll 80s linear infinite;
 }
 .animate-marquee:hover {
   animation-play-state: paused;

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../config/constants';
 
-export default function Testimonials({ theme }) {
-  const isSport = theme === 'sport';
+export default function Testimonials({ theme, layout = 'marquee' }) {
+  const isSport = theme === 'sport' || theme === 'Sport';
   const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,7 +45,26 @@ export default function Testimonials({ theme }) {
           <div className={`w-24 h-1 mx-auto ${isSport ? 'bg-red-600' : 'bg-slate-300'}`}></div>
         </div>
 
-        {filteredTestimonials.length <= 2 ? (
+        {layout === 'masonry' ? (
+          <div className="columns-1 gap-6 space-y-6 max-w-3xl mx-auto pb-12 px-4">
+            {filteredTestimonials.map((t, idx) => (
+              <div key={t.id || idx} className={`break-inside-avoid w-full p-6 sm:p-8 rounded-3xl transition-all hover:-translate-y-1 ${isSport ? 'bg-gray-900/80 border border-gray-800' : 'bg-white shadow-xl shadow-rose-100/40 border border-gray-100'}`}>
+                <div className="flex gap-1 mb-4">
+                  {[...Array(t.rating || 5)].map((_, i) => (
+                    <svg key={i} className={`w-5 h-5 ${isSport ? 'text-red-500' : 'text-amber-400'}`} fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  ))}
+                </div>
+                <p className={`text-lg italic mb-6 ${isSport ? 'text-gray-300' : 'text-slate-600'}`}>"{t.review}"</p>
+                {t.image_url && (
+                  <div className="mb-6 w-full rounded-xl overflow-hidden border border-gray-100 bg-slate-50 flex items-center justify-center">
+                    <img src={`${API_BASE_URL}/api/${t.image_url}`} alt="Review Photo" className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500" />
+                  </div>
+                )}
+                <p className={`font-bold ${isSport ? 'text-white' : 'text-slate-900'}`}>- {t.client_name} <span className="text-sm font-normal text-slate-500 block sm:inline sm:ml-2">{t.role}</span></p>
+              </div>
+            ))}
+          </div>
+        ) : filteredTestimonials.length <= 2 ? (
           <div className="flex justify-center gap-8 flex-wrap">
             {filteredTestimonials.map((t, idx) => (
               <div key={t.id || idx} className={`w-full max-w-md p-8 rounded-3xl transition-all hover:-translate-y-1 ${isSport ? 'bg-gray-900/50 border border-gray-800' : 'bg-white shadow-xl shadow-rose-100/40 border border-gray-100'}`}>

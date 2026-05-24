@@ -125,7 +125,7 @@ export default function ReviewForm() {
     );
   }
 
-  const isDarkTheme = bookingData?.booking_theme === 'sport';
+  const isDarkTheme = bookingData?.booking_theme?.toLowerCase() === 'sport';
   const mainBg = isDarkTheme ? 'bg-slate-950' : 'bg-slate-50';
   const cardBg = isDarkTheme ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-100';
   const textLabel = isDarkTheme ? 'text-slate-300' : 'text-slate-700';
@@ -236,7 +236,7 @@ export default function ReviewForm() {
       {/* Right Side: Existing Testimonials Showcase */}
       <div className={`flex-1 overflow-hidden relative flex flex-col justify-center ${isDarkTheme ? 'bg-slate-900/50 border-l border-slate-800' : 'bg-slate-100/50 border-l border-gray-200'}`}>
         <div className="w-full max-h-screen overflow-y-auto py-12 lg:py-0">
-          <Testimonials theme={bookingData?.booking_theme || 'wedding'} />
+          <Testimonials theme={bookingData?.booking_theme || 'wedding'} layout="masonry" />
         </div>
       </div>
     </div>
