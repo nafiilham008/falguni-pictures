@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Eye, Image as ImageIcon, TrendingUp, Calendar as CalendarIcon } from 'lucide-react';
+import { Users, Eye, Image as ImageIcon, TrendingUp, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { API_BASE_URL } from '../config/constants';
@@ -128,61 +128,14 @@ export default function Dashboard() {
             <div className="flex-1 flex flex-col items-center justify-center">
               <style>{`
                 .react-datepicker { font-family: inherit; border: none; width: 100%; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); border-radius: 1rem; overflow: visible; }
-                .react-datepicker__month-container { width: 100%; padding: 1rem; }
-                .react-datepicker__header { background-color: #f8fafc; border-bottom: 1px solid #f1f5f9; padding-top: 1rem; position: relative; border-top-left-radius: 1rem !important; border-top-right-radius: 1rem !important; }
-                .react-datepicker__current-month { color: #0f172a !important; font-weight: 700 !important; font-size: 1.1rem !important; margin-bottom: 0.5rem !important; }
+                .react-datepicker__month-container { width: 100%; padding: 0 0 1rem 0; }
+                .react-datepicker__header { background-color: transparent; border-bottom: none; padding: 0; }
                 .react-datepicker__day-name { color: #64748b; font-weight: 600; width: 2.5rem; }
                 .react-datepicker__day { width: 2.5rem; height: 2.5rem; line-height: 2.5rem; font-weight: 500; color: #334155; border-radius: 9999px; margin: 0.2rem; transition: all 0.2s; position: relative; }
                 .react-datepicker__day:hover { background-color: #f1f5f9; }
                 .react-datepicker__day--keyboard-selected { background-color: transparent; }
                 .highlighted-date { background-color: #3b82f6 !important; color: white !important; font-weight: bold; box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39); }
                 .highlighted-date:hover { background-color: #2563eb !important; }
-                
-                /* Custom Premium Month Navigation Buttons */
-                .react-datepicker__navigation {
-                  top: 12px !important;
-                  height: 32px !important;
-                  width: 32px !important;
-                  border-radius: 9999px !important;
-                  border: 1px solid #e2e8f0 !important;
-                  background-color: #ffffff !important;
-                  transition: all 0.2s ease-in-out !important;
-                  display: flex !important;
-                  align-items: center !important;
-                  justify-content: center !important;
-                }
-                .react-datepicker__navigation:hover {
-                  background-color: #f1f5f9 !important;
-                  border-color: #cbd5e1 !important;
-                  transform: scale(1.05);
-                }
-                .react-datepicker__navigation--previous {
-                  left: 16px !important;
-                }
-                .react-datepicker__navigation--next {
-                  right: 16px !important;
-                }
-                .react-datepicker__navigation-icon {
-                  top: 0px !important;
-                }
-                .react-datepicker__navigation-icon::before {
-                  border-color: #64748b !important;
-                  border-width: 2px 2px 0 0 !important;
-                  width: 7px !important;
-                  height: 7px !important;
-                  top: 11px !important;
-                }
-                .react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
-                  border-color: #0f172a !important;
-                }
-                .react-datepicker__navigation-icon--previous::before {
-                  left: 13px !important;
-                  transform: rotate(225deg) !important;
-                }
-                .react-datepicker__navigation-icon--next::before {
-                  left: 9px !important;
-                  transform: rotate(45deg) !important;
-                }
 
                 /* Dashboard Matching Custom Tooltip styles */
                 .datepicker-tooltip {
@@ -228,6 +181,35 @@ export default function Dashboard() {
                     "react-datepicker__day--highlighted-custom-class highlighted-date": approvedBookings.map(b => new Date(b.event_date))
                   }
                 ]}
+                renderCustomHeader={({
+                  date,
+                  decreaseMonth,
+                  increaseMonth,
+                  prevMonthButtonDisabled,
+                  nextMonthButtonDisabled,
+                }) => (
+                  <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-100 w-full rounded-t-2xl mb-2">
+                    <button
+                      onClick={decreaseMonth}
+                      disabled={prevMonthButtonDisabled}
+                      type="button"
+                      className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-600 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    <span className="text-sm font-bold text-slate-800 tracking-tight">
+                      {date.toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+                    </span>
+                    <button
+                      onClick={increaseMonth}
+                      disabled={nextMonthButtonDisabled}
+                      type="button"
+                      className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-600 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+                )}
                 renderDayContents={(day, date) => {
                   const bookingsOnDate = approvedBookings.filter(b => new Date(b.event_date).toDateString() === date.toDateString());
                   if (bookingsOnDate.length > 0) {
