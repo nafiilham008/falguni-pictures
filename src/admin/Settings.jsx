@@ -11,7 +11,7 @@ const PORTRAIT_CATEGORIES = [
   { value: 'wedding', label: 'Wedding' },
   { value: 'prewed',  label: 'Pre-Wedding' },
   { value: 'engagement', label: 'Engagement / Lamaran' },
-  { value: 'family',  label: 'Family' },
+  { value: 'custom',  label: 'Custom & Special Events' },
 ];
 
 export default function Settings() {
@@ -41,8 +41,8 @@ export default function Settings() {
     about_image_prewed: '',
     hero_image_engagement: '',
     about_image_engagement: '',
-    hero_image_family: '',
-    about_image_family: '',
+    hero_image_custom: '',
+    about_image_custom: '',
   });
   const [uploadingKey, setUploadingKey] = useState(null);
   const fileInputRef = useRef(null);

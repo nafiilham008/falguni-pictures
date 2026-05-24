@@ -7,7 +7,7 @@ const CATEGORY_LABELS = {
   wedding: 'Wedding',
   prewed:  'Pre-Wedding',
   engagement: 'Engagement / Lamaran',
-  family:  'Family',
+  custom:  'Custom & Special Events',
   others:  'Others',
 };
 

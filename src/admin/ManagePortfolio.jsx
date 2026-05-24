@@ -30,7 +30,7 @@ export default function ManagePortfolio() {
     { value: 'wedding', label: 'Wedding' },
     { value: 'prewed',  label: 'Pre-Wedding' },
     { value: 'engagement', label: 'Engagement / Lamaran' },
-    { value: 'family',  label: 'Family' },
+    { value: 'custom',  label: 'Custom & Special Events' },
     { value: 'others',  label: 'Others' },
   ];
 
