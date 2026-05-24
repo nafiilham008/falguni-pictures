@@ -2,7 +2,7 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL !== undefined
   ? import.meta.env.VITE_API_URL 
   : (import.meta.env.DEV ? "http://localhost:5000" : "");
 
-export const R2_BASE_URL = import.meta.env.VITE_R2_BASE_URL || `${API_BASE_URL}/api/media`;
+export const R2_BASE_URL = import.meta.env.VITE_R2_BASE_URL || `${API_BASE_URL}/api`;
 
 /**
  * Helper function to get the correct URL for an asset.

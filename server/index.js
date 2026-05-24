@@ -347,7 +347,13 @@ app.delete('/api/packages/:id', verifyToken, async (req, res) => {
 // Public: Get all approved testimonials
 app.get('/api/testimonials', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM testimonials WHERE is_approved = true AND review IS NOT NULL ORDER BY id DESC');
+        const result = await pool.query(`
+            SELECT t.*, b.theme_ref as booking_theme 
+            FROM testimonials t
+            LEFT JOIN bookings b ON t.booking_id = b.id
+            WHERE t.is_approved = true AND t.review IS NOT NULL 
+            ORDER BY t.id DESC
+        `);
         res.json(result.rows);
     } catch (err) {
         console.error(err.message);

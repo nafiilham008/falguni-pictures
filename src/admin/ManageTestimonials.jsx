@@ -22,6 +22,7 @@ export default function ManageTestimonials() {
   const [review, setReview] = useState('');
   const [rating, setRating] = useState(5);
   const [isApproved, setIsApproved] = useState(false);
+  const [imageUrl, setImageUrl] = useState(null);
 
   const fetchTestimonials = async () => {
     try {
@@ -85,6 +86,7 @@ export default function ManageTestimonials() {
     setReview(t.review);
     setRating(t.rating);
     setIsApproved(t.is_approved);
+    setImageUrl(t.image_url);
     setIsModalOpen(true);
   };
 
@@ -95,6 +97,7 @@ export default function ManageTestimonials() {
     setReview('');
     setRating(5);
     setIsApproved(true); // new ones added by admin are approved by default
+    setImageUrl(null);
     setIsModalOpen(true);
   };
 
@@ -407,6 +410,14 @@ export default function ManageTestimonials() {
                     <span className="ml-3 text-sm font-semibold text-slate-700">Approved & Visible to Public</span>
                   </label>
                 </div>
+                {imageUrl && (
+                  <div className="mt-4">
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Attached Photo</label>
+                    <div className="w-full h-48 rounded-xl border border-gray-200 overflow-hidden bg-slate-100 flex items-center justify-center">
+                      <img src={`${API_BASE_URL}/api/${imageUrl}`} alt="Testimonial Photo" className="w-full h-full object-contain" />
+                    </div>
+                  </div>
+                )}
               </form>
             </div>
             

@@ -22,7 +22,19 @@ export default function Pricing({ theme }) {
         if (res.ok) {
           const data = await res.json();
           // Filter by theme
-          setPackages(data.filter(pkg => pkg.theme === theme));
+          const themePackages = data.filter(pkg => pkg.theme === theme);
+          setPackages(themePackages);
+          
+          // Set default active tab synced with spotlight (popular package)
+          const uniqueCats = [...new Set(themePackages.map(p => p.category).filter(Boolean))];
+          if (uniqueCats.length > 0) {
+            const popularPkg = themePackages.find(p => p.is_popular);
+            if (popularPkg && popularPkg.category) {
+              setActiveTab(popularPkg.category);
+            } else {
+              setActiveTab(uniqueCats[0]);
+            }
+          }
         }
       } catch (err) {
         console.error("Failed to fetch packages", err);
@@ -36,10 +48,8 @@ export default function Pricing({ theme }) {
   if (loading || packages.length === 0) return null;
 
   // Extract unique categories for tabs (if any exist)
-  const categories = ['All', ...new Set(packages.map(p => p.category).filter(Boolean))];
-  const filteredPackages = activeTab === 'All' 
-    ? packages 
-    : packages.filter(p => p.category === activeTab);
+  const categories = [...new Set(packages.map(p => p.category).filter(Boolean))];
+  const filteredPackages = packages.filter(p => p.category === activeTab);
 
   return (
     <section id="pricing" className="py-24 relative z-10">

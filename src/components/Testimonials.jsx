@@ -23,7 +23,14 @@ export default function Testimonials({ theme }) {
     fetchTestimonials();
   }, []);
 
-  if (loading || testimonials.length === 0) return null;
+  const filteredTestimonials = testimonials.filter(t => {
+    // If no booking_theme, it might be manually added. Show it anyway unless it's clearly for another theme.
+    // For sport, show sport or null. For non-sport, show non-sport or null.
+    if (isSport) return t.booking_theme === 'sport' || !t.booking_theme;
+    return t.booking_theme !== 'sport';
+  });
+
+  if (loading || filteredTestimonials.length === 0) return null;
 
   return (
     <section id="testimonials" className="py-24 relative z-10">
@@ -38,9 +45,9 @@ export default function Testimonials({ theme }) {
           <div className={`w-24 h-1 mx-auto ${isSport ? 'bg-red-600' : 'bg-slate-300'}`}></div>
         </div>
 
-        {testimonials.length <= 2 ? (
+        {filteredTestimonials.length <= 2 ? (
           <div className="flex justify-center gap-8 flex-wrap">
-            {testimonials.map((t, idx) => (
+            {filteredTestimonials.map((t, idx) => (
               <div key={t.id || idx} className={`w-full max-w-md p-8 rounded-3xl transition-all hover:-translate-y-1 ${isSport ? 'bg-gray-900/50 border border-gray-800' : 'bg-white shadow-xl shadow-rose-100/40 border border-gray-100'}`}>
                 <div className="flex gap-1 mb-4">
                   {[...Array(t.rating || 5)].map((_, i) => (
@@ -48,6 +55,11 @@ export default function Testimonials({ theme }) {
                   ))}
                 </div>
                 <p className={`text-lg italic mb-6 ${isSport ? 'text-gray-300' : 'text-slate-600'}`}>"{t.review}"</p>
+                {t.image_url && (
+                  <div className="mb-6 w-full h-40 rounded-xl overflow-hidden border border-gray-100 bg-slate-50 flex items-center justify-center">
+                    <img src={`${API_BASE_URL}/api/${t.image_url}`} alt="Review Photo" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                  </div>
+                )}
                 <p className={`font-bold ${isSport ? 'text-white' : 'text-slate-900'}`}>- {t.client_name} <span className="text-sm font-normal text-slate-500 block sm:inline sm:ml-2">{t.role}</span></p>
               </div>
             ))}
@@ -58,7 +70,7 @@ export default function Testimonials({ theme }) {
             <div className="marquee-fade-right"></div>
             
             <div className="animate-marquee gap-8">
-              {[...testimonials, ...testimonials].map((t, idx) => (
+              {[...filteredTestimonials, ...filteredTestimonials].map((t, idx) => (
                 <div key={`${t.id}-${idx}`} className={`w-[400px] p-8 rounded-3xl shrink-0 transition-all ${isSport ? 'bg-gray-900/50 border border-gray-800' : 'bg-white shadow-xl shadow-rose-100/40 border border-gray-100'}`}>
                   <div className="flex gap-1 mb-4">
                     {[...Array(t.rating || 5)].map((_, i) => (
@@ -66,6 +78,11 @@ export default function Testimonials({ theme }) {
                     ))}
                   </div>
                   <p className={`text-lg italic mb-6 ${isSport ? 'text-gray-300' : 'text-slate-600'}`}>"{t.review}"</p>
+                  {t.image_url && (
+                    <div className="mb-6 w-full h-40 rounded-xl overflow-hidden border border-gray-100 bg-slate-50 flex items-center justify-center">
+                      <img src={`${API_BASE_URL}/api/${t.image_url}`} alt="Review Photo" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                    </div>
+                  )}
                   <p className={`font-bold ${isSport ? 'text-white' : 'text-slate-900'}`}>- {t.client_name} <span className="text-sm font-normal text-slate-500 block sm:inline sm:ml-2">{t.role}</span></p>
                 </div>
               ))}
