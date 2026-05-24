@@ -951,53 +951,6 @@ app.get('/api/search', verifyToken, async (req, res) => {
     }
 });
 
-app.get('/api/run-migrations', async (req, res) => {
-    try {
-        // 1. Migrate testimonials table
-        await pool.query(`
-          ALTER TABLE testimonials 
-          ADD COLUMN IF NOT EXISTS booking_id INTEGER REFERENCES bookings(id) ON DELETE SET NULL,
-          ADD COLUMN IF NOT EXISTS token VARCHAR(100) UNIQUE,
-          ADD COLUMN IF NOT EXISTS image_url TEXT,
-          ADD COLUMN IF NOT EXISTS is_approved BOOLEAN DEFAULT FALSE;
-        `);
-
-        // 2. Migrate packages table
-        await pool.query(`
-          ALTER TABLE packages 
-          ADD COLUMN IF NOT EXISTS category VARCHAR(50) DEFAULT 'wedding';
-        `);
-
-        // 3. Migrate package categories
-        await pool.query(`
-          UPDATE packages 
-          SET name = 'Custom & Special Events', category = 'custom'
-          WHERE name ILIKE '%family%';
-        `);
-        
-        await pool.query(`
-          UPDATE packages SET category = 'graduation' WHERE name ILIKE '%wisuda%' OR name ILIKE '%graduation%';
-        `);
-        
-        await pool.query(`
-          UPDATE packages SET category = 'wedding' WHERE name ILIKE '%wedding%' OR name ILIKE '%nikah%';
-        `);
-        
-        await pool.query(`
-          UPDATE packages SET category = 'prewedding' WHERE name ILIKE '%prewed%';
-        `);
-        
-        await pool.query(`
-          UPDATE packages SET category = 'sport' WHERE theme = 'sport';
-        `);
-
-        res.json({ success: true, message: "Database migrations executed successfully on production!" });
-    } catch (err) {
-        console.error("Migration Error:", err.message);
-        res.status(500).json({ success: false, error: err.message, stack: err.stack });
-    }
-});
-
 app.get('/api/health', (req, res) => {
     res.send('Backend API is running!');
 });
