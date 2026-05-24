@@ -49,6 +49,22 @@ export default function Dashboard() {
     fetchStats();
   }, []);
 
+  const getBookingsForDate = (date) => {
+    return approvedBookings.filter(b => {
+      const bDate = new Date(b.event_date);
+      return bDate.getFullYear() === date.getFullYear() &&
+             bDate.getMonth() === date.getMonth() &&
+             bDate.getDate() === date.getDate();
+    });
+  };
+
+  const todayDate = new Date();
+  const tomorrowDate = new Date();
+  tomorrowDate.setDate(todayDate.getDate() + 1);
+
+  const todayBookings = getBookingsForDate(todayDate);
+  const tomorrowBookings = getBookingsForDate(tomorrowDate);
+
   const statCards = [
     { title: 'Total Visitors', value: stats.totalViews || 0, icon: Users, color: 'bg-blue-500' },
     { title: 'Sport Theme Views', value: stats.sportViews || 0, icon: Eye, color: 'bg-red-500' },
@@ -111,12 +127,12 @@ export default function Dashboard() {
             <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center"><CalendarIcon className="mr-2 text-blue-500" /> Booking Calendar</h3>
             <div className="flex-1 flex flex-col items-center justify-center">
               <style>{`
-                .react-datepicker { font-family: inherit; border: none; width: 100%; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); border-radius: 1rem; overflow: hidden; }
+                .react-datepicker { font-family: inherit; border: none; width: 100%; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); border-radius: 1rem; overflow: visible; }
                 .react-datepicker__month-container { width: 100%; padding: 1rem; }
-                .react-datepicker__header { background-color: #f8fafc; border-bottom: 1px solid #f1f5f9; padding-top: 1rem; position: relative; }
+                .react-datepicker__header { background-color: #f8fafc; border-bottom: 1px solid #f1f5f9; padding-top: 1rem; position: relative; border-top-left-radius: 1rem !important; border-top-right-radius: 1rem !important; }
                 .react-datepicker__current-month { color: #0f172a !important; font-weight: 700 !important; font-size: 1.1rem !important; margin-bottom: 0.5rem !important; }
                 .react-datepicker__day-name { color: #64748b; font-weight: 600; width: 2.5rem; }
-                .react-datepicker__day { width: 2.5rem; height: 2.5rem; line-height: 2.5rem; font-weight: 500; color: #334155; border-radius: 9999px; margin: 0.2rem; transition: all 0.2s; }
+                .react-datepicker__day { width: 2.5rem; height: 2.5rem; line-height: 2.5rem; font-weight: 500; color: #334155; border-radius: 9999px; margin: 0.2rem; transition: all 0.2s; position: relative; }
                 .react-datepicker__day:hover { background-color: #f1f5f9; }
                 .react-datepicker__day--keyboard-selected { background-color: transparent; }
                 .highlighted-date { background-color: #3b82f6 !important; color: white !important; font-weight: bold; box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39); }
@@ -167,6 +183,42 @@ export default function Dashboard() {
                   left: 9px !important;
                   transform: rotate(45deg) !important;
                 }
+
+                /* Dashboard Matching Custom Tooltip styles */
+                .datepicker-tooltip {
+                  visibility: hidden;
+                  opacity: 0;
+                  position: absolute;
+                  bottom: 100%;
+                  left: 50%;
+                  transform: translate(-50%, -8px);
+                  background-color: #0f172a; /* slate-900 */
+                  color: #ffffff;
+                  padding: 8px 12px;
+                  border-radius: 0.75rem;
+                  width: 190px;
+                  box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+                  z-index: 100;
+                  transition: all 0.15s ease-in-out;
+                  pointer-events: none;
+                  border: 1px solid #1e293b;
+                  line-height: 1.4;
+                  text-align: left;
+                }
+                .datepicker-tooltip-arrow {
+                  position: absolute;
+                  top: 100%;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  border-width: 6px;
+                  border-style: solid;
+                  border-color: #0f172a transparent transparent transparent;
+                }
+                .group:hover .datepicker-tooltip {
+                  visibility: visible;
+                  opacity: 1;
+                  transform: translate(-50%, -4px);
+                }
               `}</style>
               <DatePicker
                 inline
@@ -180,17 +232,100 @@ export default function Dashboard() {
                   const bookingsOnDate = approvedBookings.filter(b => new Date(b.event_date).toDateString() === date.toDateString());
                   if (bookingsOnDate.length > 0) {
                     return (
-                      <div title={`${bookingsOnDate.length} booking(s): \n${bookingsOnDate.map(b => '- ' + b.client_name).join('\n')}`}>
-                        {day}
+                      <div className="relative group w-full h-full flex items-center justify-center">
+                        <span className="relative z-10">{day}</span>
+                        <div className="datepicker-tooltip">
+                          <div className="font-bold text-blue-400 text-xs mb-1.5 border-b border-slate-800 pb-1 flex justify-between items-center">
+                            <span>Bookings</span>
+                            <span className="bg-blue-500/20 text-blue-300 text-[10px] px-1.5 py-0.2 rounded-full font-black">
+                              {bookingsOnDate.length} Approved
+                            </span>
+                          </div>
+                          <div className="space-y-1.5 max-h-32 overflow-y-auto no-scrollbar">
+                            {bookingsOnDate.map((b, idx) => (
+                              <div key={idx} className="text-[11px] leading-tight">
+                                <div className="font-semibold text-slate-100 truncate">• {b.client_name}</div>
+                                <div className="text-[10px] text-slate-400 pl-2.5 truncate">{b.event}</div>
+                                {b.location && (
+                                  <div className="text-[9px] text-slate-500 pl-2.5 truncate">📍 {b.location}</div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                          <div className="datepicker-tooltip-arrow"></div>
+                        </div>
                       </div>
                     );
                   }
                   return day;
                 }}
               />
-              <p className="text-xs text-slate-500 mt-6 text-center max-w-sm">
-                Dates highlighted in blue indicate an approved booking. Hover over a highlighted date to see details.
-              </p>
+              
+              <div className="w-full mt-6 pt-6 border-t border-slate-100">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">📅 Agenda / Bookings Schedule</h4>
+                  <span className="text-[11px] text-slate-400">Blue dates indicate approved slots</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Today's Agenda */}
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-xs font-bold text-slate-700">Today</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        todayBookings.length > 0 
+                          ? 'bg-blue-50 text-blue-600 border border-blue-100' 
+                          : 'bg-slate-200/50 text-slate-500'
+                      }`}>
+                        {todayBookings.length} {todayBookings.length === 1 ? 'Booking' : 'Bookings'}
+                      </span>
+                    </div>
+                    {todayBookings.length > 0 ? (
+                      <ul className="space-y-2">
+                        {todayBookings.map((b, idx) => (
+                          <li key={idx} className="text-xs text-slate-600 flex items-start space-x-2">
+                            <span className="text-blue-500 mt-0.5 font-bold">•</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-bold text-slate-800 truncate" title={b.client_name}>{b.client_name}</div>
+                              <div className="text-[10px] text-slate-500 truncate">{b.event} {b.location ? `| 📍 ${b.location}` : ''}</div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-xs text-slate-400 italic">No bookings scheduled for today</p>
+                    )}
+                  </div>
+
+                  {/* Tomorrow's Agenda */}
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-xs font-bold text-slate-700">Tomorrow</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        tomorrowBookings.length > 0 
+                          ? 'bg-indigo-50 text-indigo-600 border border-indigo-100' 
+                          : 'bg-slate-200/50 text-slate-500'
+                      }`}>
+                        {tomorrowBookings.length} {tomorrowBookings.length === 1 ? 'Booking' : 'Bookings'}
+                      </span>
+                    </div>
+                    {tomorrowBookings.length > 0 ? (
+                      <ul className="space-y-2">
+                        {tomorrowBookings.map((b, idx) => (
+                          <li key={idx} className="text-xs text-slate-600 flex items-start space-x-2">
+                            <span className="text-indigo-500 mt-0.5 font-bold">•</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-bold text-slate-800 truncate" title={b.client_name}>{b.client_name}</div>
+                              <div className="text-[10px] text-slate-500 truncate">{b.event} {b.location ? `| 📍 ${b.location}` : ''}</div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-xs text-slate-400 italic">No bookings scheduled for tomorrow</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
