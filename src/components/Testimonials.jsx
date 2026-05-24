@@ -40,7 +40,7 @@ export default function Testimonials({ theme, layout = 'marquee' }) {
           <h2 className={`text-sm tracking-[0.2em] font-bold uppercase mb-4 ${isSport ? 'text-red-500' : 'text-slate-500'}`}>
             Client Reviews
           </h2>
-          <h3 className={`text-4xl md:text-5xl mb-6 ${isSport ? 'font-black uppercase tracking-tight' : 'font-serif italic text-slate-900'}`}>
+          <h3 className={`text-4xl md:text-5xl mb-6 ${isSport ? 'font-black uppercase tracking-tight text-white' : 'font-serif italic text-slate-900'}`}>
             WHAT THEY SAY
           </h3>
           <div className={`w-24 h-1 mx-auto ${isSport ? 'bg-red-600' : 'bg-slate-300'}`}></div>
