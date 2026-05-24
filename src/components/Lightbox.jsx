@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 export default function Lightbox({ isOpen, event, theme, onClose }) {
   if (!isOpen || !event) return null;
@@ -6,16 +7,22 @@ export default function Lightbox({ isOpen, event, theme, onClose }) {
   const isSport = theme === 'sport';
   const roundedClass = isSport ? 'rounded-none border-4 border-white' : 'rounded-3xl border border-gray-500/50';
 
-  return (
+  // Use createPortal to render directly into document.body,
+  // bypassing ALL parent stacking contexts (including the Portfolio section).
+  return createPortal(
     <div 
-      className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center p-4 md:p-10 transition-opacity duration-300"
+      style={{ zIndex: 9999 }}
+      className="fixed inset-0 bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center p-4 md:p-10"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
+      {/* Close Button — always on top */}
       <button 
-        className="fixed top-6 right-6 md:top-8 md:right-8 text-white hover:text-red-500 z-[1100] transition-colors w-12 h-12 flex items-center justify-center bg-black/50 hover:bg-black/80 rounded-full backdrop-blur-md border border-white/20 shadow-xl"
+        style={{ zIndex: 10000 }}
+        className="fixed top-6 right-6 md:top-8 md:right-8 text-white hover:text-red-500 transition-colors duration-200 w-14 h-14 flex items-center justify-center bg-black/60 hover:bg-red-600/80 rounded-full backdrop-blur-md border-2 border-white/30 shadow-2xl"
         onClick={(e) => { e.stopPropagation(); onClose(); }}
+        aria-label="Close"
       >
-        <X size={28} strokeWidth={2.5} />
+        <X size={30} strokeWidth={2.5} />
       </button>
 
       <div 
@@ -48,6 +55,7 @@ export default function Lightbox({ isOpen, event, theme, onClose }) {
                 <img 
                   key={idx}
                   src={src} 
+                  alt={event.title}
                   className={`w-full h-auto object-contain max-h-[85vh] shadow-2xl flex-shrink-0 ${roundedClass}`}
                 />
               );
@@ -55,6 +63,7 @@ export default function Lightbox({ isOpen, event, theme, onClose }) {
           })}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -34,30 +34,31 @@ export default function Pricing({ theme }) {
 
         if (pkgsRes.ok) {
           const data = await pkgsRes.json();
-          // Filter by theme
-          const themePackages = data.filter(pkg => pkg.theme === theme);
+          // Filter by theme (support both 'portrait' and legacy theme names)
+          const themePackages = data.filter(pkg => {
+            if (isSport) return pkg.theme === 'sport';
+            // Portrait: include packages with theme='portrait' OR legacy portrait themes
+            const portraitThemes = ['portrait', 'wisuda', 'prewed', 'wedding', 'engagement', 'custom'];
+            return portraitThemes.includes(pkg.theme);
+          });
           setPackages(themePackages);
           
-          let defaultTab = null;
-          if (!isSport && settingsRes && settingsRes.ok) {
-             const settings = await settingsRes.json();
-             defaultTab = settings.portrait_spotlight;
-          }
-          
-          // Set default active tab
+          // Get unique categories from the filtered packages
           const uniqueCats = [...new Set(themePackages.map(p => p.category).filter(Boolean))];
-          if (uniqueCats.length > 0) {
-            if (defaultTab && uniqueCats.includes(defaultTab)) {
-              setActiveTab(defaultTab);
-            } else {
-              const popularPkg = themePackages.find(p => p.is_popular);
-              if (popularPkg && popularPkg.category) {
-                setActiveTab(popularPkg.category);
-              } else {
-                setActiveTab(uniqueCats[0]);
-              }
+          if (uniqueCats.length === 0) return;
+
+          // Priority 1: Use portrait_spotlight from settings (for portrait theme)
+          if (!isSport && settingsRes && settingsRes.ok) {
+            const settings = await settingsRes.json();
+            const spotlight = settings.portrait_spotlight;
+            if (spotlight && uniqueCats.includes(spotlight)) {
+              setActiveTab(spotlight);
+              return; // Done — use spotlight as default
             }
           }
+
+          // Priority 2: Fall back to first available category
+          setActiveTab(uniqueCats[0]);
         }
       } catch (err) {
         console.error("Failed to fetch packages", err);
