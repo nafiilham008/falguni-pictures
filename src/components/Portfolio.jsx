@@ -193,7 +193,7 @@ export default function Portfolio({ theme }) {
   // =============================================
   if (isSport) {
     return (
-      <section id="portfolio" className="py-24 relative z-10 transition-theme">
+      <section id="portfolio" className={`py-24 relative transition-theme ${activeEvent ? 'z-[1000]' : 'z-10'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-sm tracking-[0.2em] uppercase mb-4 text-red-500 font-bold">Our Works</h2>
@@ -213,7 +213,7 @@ export default function Portfolio({ theme }) {
   // PORTRAIT LAYOUT — Spotlight + filter tabs
   // =============================================
   return (
-    <section id="portfolio" className="py-24 relative z-10 transition-theme">
+    <section id="portfolio" className={`py-24 relative transition-theme ${activeEvent ? 'z-[1000]' : 'z-10'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Section Header */}
