@@ -6,7 +6,7 @@ import { Link2, Globe, MessageSquare, Loader2 } from 'lucide-react';
 export default function BioLinks() {
   const [links, setLinks] = useState([]);
   const [settings, setSettings] = useState({
-    landing_title: 'MRF Photography',
+    landing_title: "MAHDIAN MA'RUF",
     landing_bio: 'Capturing stories, emotions, and action.',
     landing_avatar: '',
     instagram_username: '',

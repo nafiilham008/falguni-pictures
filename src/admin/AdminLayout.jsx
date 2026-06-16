@@ -138,8 +138,8 @@ export default function AdminLayout() {
       {/* Mobile Top Bar */}
       <div className="md:hidden flex items-center justify-between h-16 bg-white border-b border-gray-200 px-4 sticky top-0 z-30">
         <Link to="/dashboard" className="flex items-center space-x-2">
-          <img src={getAssetUrl('assets/media/logo-transparent.png')} alt="Logo" className="h-8 w-8 object-contain" />
-          <span className="font-black uppercase tracking-widest text-slate-800 text-sm">MRF Photography</span>
+          <img src={getAssetUrl('assets/media/avatar.png')} alt="Logo" className="h-8 w-8 rounded-full object-cover border border-slate-200" />
+          <span className="font-black uppercase tracking-widest text-slate-800 text-sm">MAHDIAN MA'RUF</span>
         </Link>
         <button onClick={toggleMobileSidebar} className="text-slate-600 p-2">
           {isMobileSidebarOpen ? (
@@ -160,11 +160,11 @@ export default function AdminLayout() {
         <div className="h-20 flex items-center px-6 border-b border-gray-100">
           <Link to="/dashboard" className="flex items-center space-x-3 text-slate-900 hover:opacity-80 transition-opacity w-full">
             <img
-              src={getAssetUrl('assets/media/logo-transparent.png')}
-              alt="MRF Photography"
-              className="h-10 w-10 object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.1)]"
+              src={getAssetUrl('assets/media/avatar.png')} 
+              alt="MAHDIAN MA'RUF"
+              className="w-8 h-8 rounded-full object-cover border-2 border-slate-200"
             />
-            <span className="text-sm font-black tracking-widest uppercase text-slate-800 font-sans">MRF Photography</span>
+            <span className="text-sm font-black tracking-widest uppercase text-slate-800 font-sans">MAHDIAN MA'RUF</span>
           </Link>
         </div>
 

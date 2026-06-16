@@ -43,9 +43,9 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 font-sans text-slate-800">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-        <div className="p-8 pb-6 text-center border-b border-gray-100 bg-slate-900 text-white">
-          <h1 className="text-2xl font-black tracking-widest uppercase mb-2">MRF Photography</h1>
-          <p className="text-slate-300 text-sm font-semibold">Admin Secure Login</p>
+        <div className="p-8 pb-6 text-center border-b border-gray-100">
+          <h1 className="text-2xl font-black tracking-widest uppercase mb-2">MAHDIAN MA'RUF</h1>
+          <p className="text-slate-500 text-sm font-semibold">Sign in to Admin Dashboard</p>
         </div>
         
         <div className="p-8">
@@ -108,9 +108,9 @@ export default function Login() {
         </div>
       </div>
       
-      <p className="mt-8 text-slate-400 text-sm font-semibold">
-        &copy; {new Date().getFullYear()} MRF Photography. All rights reserved.
-      </p>
+      <div className="mt-8 text-slate-400 text-sm font-semibold">
+        &copy; {new Date().getFullYear()} MAHDIAN MA'RUF. All rights reserved.
+      </div>
     </div>
   );
 }

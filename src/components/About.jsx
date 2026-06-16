@@ -55,7 +55,7 @@ export default function About({ theme }) {
             The Story Behind {isSport ? 'VeloLens' : 'Falguni'}
           </h2>
           <h3 className={`text-4xl md:text-5xl mb-8 ${isSport ? 'font-black uppercase tracking-tight' : 'font-serif italic text-slate-900'}`}>
-            {isSport ? 'VeloLens' : 'Falguni Portrait'}
+            {isSport ? 'VeloLens' : 'Falguni'}
           </h3>
           <p className={`text-lg md:text-xl leading-relaxed max-w-3xl mx-auto mb-8 ${isSport ? 'text-gray-300' : 'text-slate-700'}`}>
             We are a visual collective dedicated to freezing the crucial moments in your life. 

@@ -28,7 +28,7 @@ export default function Footer({ theme }) {
     <footer className={`py-12 text-center border-t transition-theme border-dynamic footer-dynamic relative z-50 ${isSport ? 'border-gray-800 bg-black text-gray-400' : 'border-gray-300 bg-white text-slate-500'}`}>
       <div className="max-w-7xl mx-auto px-4">
         <p className="font-semibold tracking-widest text-sm uppercase mb-2">
-          © 2026 {isSport ? 'VeloLens' : 'Falguni Portrait'}
+          © 2026 {isSport ? 'VeloLens' : 'Falguni'}
         </p>
         <p className={`text-xs ${isSport ? 'text-gray-600' : 'text-slate-400'}`}>
           All rights reserved. Professional Photography & Visual Storytelling.

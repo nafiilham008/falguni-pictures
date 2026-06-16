@@ -36,7 +36,7 @@ export default function Settings() {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   // General Landing Settings
-  const [landingTitle, setLandingTitle] = useState('MRF Photography');
+  const [landingTitle, setLandingTitle] = useState("MAHDIAN MA'RUF");
   const [landingBio, setLandingBio] = useState('');
 
   // Bio Links Settings
@@ -689,7 +689,7 @@ export default function Settings() {
                         type="text" value={landingTitle}
                         onChange={e => setLandingTitle(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-shadow outline-none"
-                        placeholder="MRF Photography" required
+                        placeholder="MAHDIAN MA'RUF" required
                       />
                     </div>
 

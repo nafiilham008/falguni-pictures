@@ -5,7 +5,7 @@ import { ArrowRight, Link2 } from 'lucide-react';
 
 export default function GeneralLanding() {
   const [settings, setSettings] = useState({
-    landing_title: 'MRF Photography',
+    landing_title: "MAHDIAN MA'RUF",
     landing_bio: 'Capturing stories, emotions, and action. Specialized in elegant portraiture and high-impact sports photography.',
     landing_avatar: '',
     landing_cover_portrait: '',
@@ -41,7 +41,7 @@ export default function GeneralLanding() {
           const schemaData = {
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
-            "name": data.landing_title || "MRF Photography",
+            "name": data.landing_title || "MAHDIAN MA'RUF",
             "image": data.landing_avatar ? getAssetUrl(data.landing_avatar) : '',
             "description": data.landing_bio || '',
             "address": {
@@ -185,7 +185,7 @@ export default function GeneralLanding() {
           <div className="absolute inset-0 z-0">
             <img 
               src={coverPortrait} 
-              alt="Falguni Portrait" 
+              alt="Falguni" 
               className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 brightness-[0.4] group-hover:brightness-[0.45]"
             />
             {/* Soft Warm gradient overlay */}
@@ -198,7 +198,7 @@ export default function GeneralLanding() {
               Elegant Fine-Art
             </span>
             <h2 className="text-3xl md:text-4xl font-serif italic text-white mb-2 drop-shadow-lg">
-              Falguni Portrait
+              Falguni
             </h2>
             <p className="text-gray-300 text-sm md:text-base mb-6 font-light leading-relaxed max-w-md">
               Elegant wedding, warm graduation, and beautiful editorial engagement sessions tailored for timeless memories.
