@@ -650,7 +650,7 @@ export default function Settings() {
 
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">Instagram Username</label>
-                  <p className="text-xs text-slate-500 mb-3">Without @ symbol, e.g., falgunipicture</p>
+                  <p className="text-xs text-slate-500 mb-3">Without @ symbol, e.g., mrfphotography</p>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                       <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
@@ -663,7 +663,7 @@ export default function Settings() {
                       type="text" value={instagramUsername}
                       onChange={e => setInstagramUsername(e.target.value)}
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-slate-900 focus:border-slate-900 transition-shadow outline-none"
-                      placeholder="falgunipicture" required
+                      placeholder="mrfphotography" required
                     />
                   </div>
                 </div>
@@ -708,9 +708,9 @@ export default function Settings() {
                   <div className="bg-slate-50 p-6 rounded-2xl border border-gray-100 space-y-4">
                     <h4 className="font-bold text-slate-800 text-sm">Visuals & Branding</h4>
                     <VisualImageRow label="Profile Photo / Avatar" settingKey="landing_avatar" />
-                    <VisualImageRow label="Falguni (Portrait) Card Cover" settingKey="landing_cover_portrait" />
+                    <VisualImageRow label="MRF Portrait Card Cover" settingKey="landing_cover_portrait" />
                     <VisualImageRow label="VeloLens (Sport) Card Cover" settingKey="landing_cover_sport" />
-                    <VisualImageRow label="Falguni Portrait Custom Logo" settingKey="logo_portrait" />
+                    <VisualImageRow label="MRF Portrait Custom Logo" settingKey="logo_portrait" />
                     <VisualImageRow label="VeloLens Sport Custom Logo" settingKey="logo_sport" />
                   </div>
                 </div>

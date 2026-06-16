@@ -144,7 +144,7 @@ export default function ReviewForm() {
           
           <h1 className={`text-3xl sm:text-4xl mb-2 relative z-10 ${isDarkTheme ? 'font-black text-white uppercase tracking-tight' : 'font-serif italic text-white'}`}>How did we do?</h1>
           <p className="text-slate-200 relative z-10 font-medium">
-            Hi {bookingData?.client_name}, we'd love to hear about your experience with Falguni!
+            Hi {bookingData?.client_name}, we'd love to hear about your experience with {bookingData?.theme_ref === 'sport' ? 'VeloLens' : 'MRF Photography'}!
           </p>
         </div>
 

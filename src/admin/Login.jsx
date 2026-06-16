@@ -44,7 +44,7 @@ export default function Login() {
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 font-sans text-slate-800">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
         <div className="p-8 pb-6 text-center border-b border-gray-100 bg-slate-900 text-white">
-          <h1 className="text-3xl font-black tracking-widest uppercase mb-2">Falguni</h1>
+          <h1 className="text-2xl font-black tracking-widest uppercase mb-2">MRF Photography</h1>
           <p className="text-slate-300 text-sm font-semibold">Admin Secure Login</p>
         </div>
         
@@ -109,7 +109,7 @@ export default function Login() {
       </div>
       
       <p className="mt-8 text-slate-400 text-sm font-semibold">
-        &copy; {new Date().getFullYear()} Falguni Picture. All rights reserved.
+        &copy; {new Date().getFullYear()} MRF Photography. All rights reserved.
       </p>
     </div>
   );

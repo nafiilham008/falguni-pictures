@@ -139,7 +139,7 @@ export default function AdminLayout() {
       <div className="md:hidden flex items-center justify-between h-16 bg-white border-b border-gray-200 px-4 sticky top-0 z-30">
         <Link to="/dashboard" className="flex items-center space-x-2">
           <img src={getAssetUrl('assets/media/logo-transparent.png')} alt="Logo" className="h-8 w-8 object-contain" />
-          <span className="font-black uppercase tracking-widest text-slate-800">Falguni</span>
+          <span className="font-black uppercase tracking-widest text-slate-800 text-sm">MRF Photography</span>
         </Link>
         <button onClick={toggleMobileSidebar} className="text-slate-600 p-2">
           {isMobileSidebarOpen ? (
@@ -161,10 +161,10 @@ export default function AdminLayout() {
           <Link to="/dashboard" className="flex items-center space-x-3 text-slate-900 hover:opacity-80 transition-opacity w-full">
             <img
               src={getAssetUrl('assets/media/logo-transparent.png')}
-              alt="Falguni Picture"
+              alt="MRF Photography"
               className="h-10 w-10 object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.1)]"
             />
-            <span className="text-lg font-black tracking-widest uppercase text-slate-800 font-sans">Falguni</span>
+            <span className="text-sm font-black tracking-widest uppercase text-slate-800 font-sans">MRF Photography</span>
           </Link>
         </div>
 

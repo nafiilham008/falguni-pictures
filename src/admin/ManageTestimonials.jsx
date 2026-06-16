@@ -198,7 +198,7 @@ export default function ManageTestimonials() {
       <div className="mb-8 flex flex-col md:flex-row justify-between md:items-end gap-4">
         <div>
           <h2 className="text-3xl font-black tracking-tight text-slate-900">Manage Testimonials</h2>
-          <p className="text-slate-500 mt-1">Manage reviews from clients who have used Falguni services.</p>
+          <p className="text-slate-500 mt-1">Manage reviews from clients who have used MRF Photography services.</p>
         </div>
         
         <div className="flex flex-col sm:flex-row items-center gap-4">
