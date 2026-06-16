@@ -93,6 +93,55 @@ async function initializeDatabase() {
             );
         `);
 
+        // Create bio_links table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS bio_links (
+                id SERIAL PRIMARY KEY,
+                label VARCHAR(255) NOT NULL,
+                url VARCHAR(255) NOT NULL,
+                is_active BOOLEAN DEFAULT TRUE,
+                sort_order INTEGER DEFAULT 0,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
+        // Delete discontinued settings related to sport category spotlights
+        await pool.query(`
+            DELETE FROM site_settings 
+            WHERE setting_key IN (
+                'sport_spotlight', 
+                'hero_image_sport_football', 'about_image_sport_football', 
+                'hero_image_sport_motorsport', 'about_image_sport_motorsport', 
+                'hero_image_sport_cycling', 'about_image_sport_cycling', 
+                'hero_image_sport_others', 'about_image_sport_others'
+            )
+        `);
+
+        // Seed default site settings
+        const defaultSettings = [
+            ['landing_title', 'MRF Photography'],
+            ['landing_bio', 'Capturing stories, emotions, and action. Specialized in elegant portraiture (Falguni Portrait) and high-impact sports photography (VeloLens Sport).'],
+            ['landing_avatar', ''],
+            ['landing_cover_portrait', ''],
+            ['landing_cover_sport', ''],
+            ['logo_portrait', ''],
+            ['logo_sport', ''],
+            ['hero_image_sport', ''],
+            ['about_image_sport', '']
+        ];
+        for (const [key, val] of defaultSettings) {
+            await pool.query(
+                'INSERT INTO site_settings (setting_key, setting_value) VALUES ($1, $2) ON CONFLICT (setting_key) DO NOTHING',
+                [key, val]
+            );
+        }
+
+        // Migrate sport events without category to 'others'
+        await pool.query(`
+            UPDATE events SET category = 'others' WHERE theme = 'sport' AND category IS NULL;
+        `);
+
+
         // ── LEGACY DATA MIGRATION (idempotent — safe to run every startup) ──
         //
         // Old schema used 'theme' to store portrait sub-category (e.g. theme='wisuda', theme='prewed').
@@ -313,6 +362,21 @@ app.get('/api/portrait-categories', async (req, res) => {
         const result = await pool.query(`
             SELECT DISTINCT category FROM events 
             WHERE theme = 'portrait' AND category IS NOT NULL 
+            ORDER BY category ASC
+        `);
+        res.json(result.rows.map(r => r.category));
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Get distinct sport categories (for filter tabs)
+app.get('/api/sport-categories', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT DISTINCT category FROM events 
+            WHERE theme = 'sport' AND category IS NOT NULL 
             ORDER BY category ASC
         `);
         res.json(result.rows.map(r => r.category));
@@ -876,6 +940,99 @@ app.put('/api/settings', verifyToken, async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+
+// ==========================================
+// 8. BIO LINKS (LINKTREE REPLACEMENT) API
+// ==========================================
+// Public: Get all active links
+app.get('/api/bio-links', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM bio_links WHERE is_active = true ORDER BY sort_order ASC, id ASC');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Failed to get bio links:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Admin: Get all links (including inactive)
+app.get('/api/admin/bio-links', verifyToken, async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM bio_links ORDER BY sort_order ASC, id ASC');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Failed to get admin bio links:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Admin: Create new link
+app.post('/api/bio-links', verifyToken, async (req, res) => {
+    try {
+        const { label, url, is_active, sort_order } = req.body;
+        const result = await pool.query(
+            'INSERT INTO bio_links (label, url, is_active, sort_order) VALUES ($1, $2, $3, $4) RETURNING *',
+            [label, url, is_active !== undefined ? is_active : true, sort_order || 0]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error('Failed to create bio link:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Admin: Update a link
+app.put('/api/bio-links/:id', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { label, url, is_active, sort_order } = req.body;
+        const result = await pool.query(
+            'UPDATE bio_links SET label = $1, url = $2, is_active = $3, sort_order = $4 WHERE id = $5 RETURNING *',
+            [label, url, is_active, sort_order, id]
+        );
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error('Failed to update bio link:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Admin: Delete a link
+app.delete('/api/bio-links/:id', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        await pool.query('DELETE FROM bio_links WHERE id = $1', [id]);
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Failed to delete bio link:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Admin: Reorder bio links
+app.put('/api/admin/bio-links/reorder', verifyToken, async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids)) {
+            return res.status(400).json({ error: 'Missing or invalid ids array' });
+        }
+        
+        await pool.query('BEGIN');
+        for (let idx = 0; idx < ids.length; idx++) {
+            await pool.query(
+                'UPDATE bio_links SET sort_order = $1 WHERE id = $2',
+                [idx, ids[idx]]
+            );
+        }
+        await pool.query('COMMIT');
+        res.json({ success: true });
+    } catch (err) {
+        await pool.query('ROLLBACK');
+        console.error('Failed to reorder bio links:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 
 // Update Admin Password
 app.put('/api/admin/password', verifyToken, async (req, res) => {

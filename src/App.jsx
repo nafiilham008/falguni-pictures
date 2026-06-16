@@ -9,6 +9,8 @@ import Testimonials from './components/Testimonials';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import ReviewForm from './pages/ReviewForm';
+import GeneralLanding from './pages/GeneralLanding';
+import BioLinks from './pages/BioLinks';
 
 // Admin Components
 import AdminLayout from './admin/AdminLayout';
@@ -24,55 +26,27 @@ import ProtectedRoute from './admin/ProtectedRoute';
 import { API_BASE_URL } from './config/constants';
 
 // Create a component for the main website to wrap existing logic
-function MainWebsite() {
-  const [theme, setTheme] = useState('sport');
+function MainWebsite({ theme }) {
   const [isInitializing, setIsInitializing] = useState(true);
 
   const location = useLocation();
   const isFirstMount = useRef(true);
+  const navigate = useNavigate();
 
-  // Initialize theme from localStorage or DB
+  // Reset initialization state on theme change
   useEffect(() => {
-    const initTheme = async () => {
-      try {
-        const cached = localStorage.getItem('falguni_theme');
-        if (cached) {
-          setTheme(cached);
-          setIsInitializing(false);
-          return;
-        }
-        
-        // No cached theme, fetch default from DB
-        const res = await fetch(`${API_BASE_URL}/api/settings`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.default_theme) {
-            setTheme(data.default_theme);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to fetch initial theme", err);
-      } finally {
-        setIsInitializing(false);
-      }
-    };
-    initTheme();
-  }, []);
-
-  // Simpan tema ke localStorage setiap kali berubah dan scroll ke atas
-  useEffect(() => {
-    if (isInitializing) return;
-    localStorage.setItem('falguni_theme', theme);
+    setIsInitializing(false);
+    
+    // Scroll to top on load or route change
     if (isFirstMount.current) {
       isFirstMount.current = false;
       return;
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [theme, isInitializing]);
+  }, [theme]);
 
   // Visitor Tracking
   useEffect(() => {
-    // Only track if not in dev mode (optional) or just track everything for now
     const trackVisitor = async () => {
       try {
         await fetch(`${API_BASE_URL}/api/analytics`, {
@@ -114,6 +88,11 @@ function MainWebsite() {
     );
   }
 
+  // Theme switch handler that performs navigation instead of state toggle
+  const handleSetTheme = (newTheme) => {
+    navigate(newTheme === 'sport' ? '/velolens' : '/falguni');
+  };
+
   return (
     <div className="min-h-screen">
       <div className="fixed inset-0 pointer-events-none -z-20 overflow-hidden transition-theme">
@@ -130,7 +109,7 @@ function MainWebsite() {
         <div className="falling-dust delay-4"></div>
       </div>
 
-      <Navbar theme={theme} setTheme={setTheme} />
+      <Navbar theme={theme} setTheme={handleSetTheme} />
       <Hero theme={theme} />
       <Portfolio theme={theme} />
       <Pricing theme={theme} />
@@ -146,8 +125,15 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Main Public Website Route */}
-        <Route path="/" element={<MainWebsite />} />
+        {/* Main General Landing Route */}
+        <Route path="/" element={<GeneralLanding />} />
+        
+        {/* Dynamic Bio Links Route (Linktree replacement) */}
+        <Route path="/links" element={<BioLinks />} />
+        
+        {/* Brand Portfolios Routes */}
+        <Route path="/falguni" element={<MainWebsite theme="portrait" />} />
+        <Route path="/velolens" element={<MainWebsite theme="sport" />} />
         
         {/* Testimonial Submission Form */}
         <Route path="/review/:token" element={<ReviewForm />} />
@@ -171,7 +157,5 @@ function App() {
     </BrowserRouter>
   );
 }
-
-
 
 export default App;

@@ -35,7 +35,17 @@ export default function ManagePortfolio() {
     { value: 'others',  label: 'Others' },
   ];
 
-  const getCategoryLabel = (val) => PORTRAIT_CATEGORIES.find(c => c.value === val)?.label || val;
+  const SPORT_CATEGORIES = [
+    { value: 'football',  label: 'Football / Soccer' },
+    { value: 'motorsport', label: 'Motorsport / Automotive' },
+    { value: 'cycling',    label: 'Cycling' },
+    { value: 'others',     label: 'Others' },
+  ];
+
+  const getCategoryLabel = (val) => 
+    PORTRAIT_CATEGORIES.find(c => c.value === val)?.label || 
+    SPORT_CATEGORIES.find(c => c.value === val)?.label || 
+    val;
 
   const fetchEvents = async () => {
     try {

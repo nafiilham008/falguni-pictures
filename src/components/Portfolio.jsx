@@ -11,6 +11,13 @@ const CATEGORY_LABELS = {
   others:  'Others',
 };
 
+const SPORT_CATEGORY_LABELS = {
+  football:  'Football / Soccer',
+  motorsport: 'Motorsport / Automotive',
+  cycling:   'Cycling',
+  others:    'Others',
+};
+
 export default function Portfolio({ theme }) {
   const isSport = theme === 'sport';
   const [data, setData] = useState([]);
@@ -43,25 +50,31 @@ export default function Portfolio({ theme }) {
     fetchPortfolio();
   }, [theme]);
 
-  // For portrait: fetch spotlight setting & available categories
+  // Fetch spotlight setting & available categories for both themes
   useEffect(() => {
-    if (isSport) return;
     const fetchMeta = async () => {
       try {
+        const categoriesEndpoint = isSport 
+          ? `${API_BASE_URL}/api/sport-categories`
+          : `${API_BASE_URL}/api/portrait-categories`;
+
         const [settingsRes, categoriesRes] = await Promise.all([
           fetch(`${API_BASE_URL}/api/settings`),
-          fetch(`${API_BASE_URL}/api/portrait-categories`),
+          fetch(categoriesEndpoint),
         ]);
+
         if (settingsRes.ok) {
           const s = await settingsRes.json();
-          setSpotlight(s.portrait_spotlight || 'wisuda');
+          if (!isSport) {
+            setSpotlight(s.portrait_spotlight || 'wisuda');
+          }
         }
         if (categoriesRes.ok) {
           const cats = await categoriesRes.json();
           setCategories(cats);
         }
       } catch (err) {
-        console.error("Failed to fetch portrait meta", err);
+        console.error(`Failed to fetch ${theme} meta`, err);
       }
     };
     fetchMeta();
@@ -146,11 +159,11 @@ export default function Portfolio({ theme }) {
             </div>
           )}
 
-          {/* Category badge (portrait only) */}
-          {!isSport && event.category && (
+          {/* Category badge */}
+          {event.category && (
             <div className="absolute top-3 left-3 pointer-events-none">
-              <span className="text-[10px] font-black tracking-widest uppercase px-2 py-1 rounded-full bg-white/80 text-slate-700 backdrop-blur-sm">
-                {CATEGORY_LABELS[event.category] || event.category}
+              <span className={`text-[10px] font-black tracking-widest uppercase px-2 py-1 rounded-full backdrop-blur-sm ${isSport ? 'bg-black/60 text-white border border-white/10' : 'bg-white/80 text-slate-700'}`}>
+                {isSport ? (SPORT_CATEGORY_LABELS[event.category] || event.category) : (CATEGORY_LABELS[event.category] || event.category)}
               </span>
             </div>
           )}
@@ -182,15 +195,12 @@ export default function Portfolio({ theme }) {
   if (loading && data.length === 0) {
     return (
       <section id="portfolio" className="py-24 text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900 mx-auto"></div>
-        <p className="mt-4 text-slate-500 font-semibold uppercase tracking-widest text-xs">Loading Gallery...</p>
+        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 mx-auto ${isSport ? 'border-red-500' : 'border-slate-900'}`}></div>
+        <p className={`mt-4 font-semibold uppercase tracking-widest text-xs ${isSport ? 'text-gray-400' : 'text-slate-500'}`}>Loading Gallery...</p>
       </section>
     );
   }
 
-  // =============================================
-  // SPORT LAYOUT — unchanged, single grid
-  // =============================================
   if (isSport) {
     return (
       <section id="portfolio" className="py-24 relative z-10 transition-theme">
@@ -209,18 +219,19 @@ export default function Portfolio({ theme }) {
     );
   }
 
-  // =============================================
-  // PORTRAIT LAYOUT — Spotlight + filter tabs
-  // =============================================
   return (
     <section id="portfolio" className="py-24 relative z-10 transition-theme">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-sm tracking-[0.2em] uppercase mb-4 text-slate-500 font-sans">Our Works</h2>
-          <h3 className="text-4xl md:text-5xl mb-6 font-serif italic text-slate-900">Selected Projects</h3>
-          <div className="w-24 h-1 mx-auto bg-slate-300"></div>
+          <h2 className={`text-sm tracking-[0.2em] uppercase mb-4 font-bold ${isSport ? 'text-red-500' : 'text-slate-500 font-sans'}`}>
+            Our Works
+          </h2>
+          <h3 className={`text-4xl md:text-5xl mb-6 ${isSport ? 'font-black uppercase tracking-tight' : 'font-serif italic text-slate-900'}`}>
+            {isSport ? 'SELECTED PROJECTS' : 'Selected Projects'}
+          </h3>
+          <div className={`w-24 h-1 mx-auto ${isSport ? 'bg-red-600' : 'bg-slate-300'}`}></div>
         </div>
 
         {/* ── NOW SPOTLIGHTING ── */}
@@ -228,22 +239,21 @@ export default function Portfolio({ theme }) {
           <div className="mb-20">
             {/* Spotlight header */}
             <div className="flex items-center gap-4 mb-8">
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent to-rose-200"></div>
-              <div className="flex items-center gap-2 px-5 py-2 rounded-full border border-rose-200 bg-rose-50">
-                <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse inline-block"></span>
-                <span className="text-xs font-black tracking-[0.25em] uppercase text-rose-600">
+              <div className={`flex-1 h-px bg-gradient-to-r from-transparent ${isSport ? 'to-red-950/40' : 'to-rose-200'}`}></div>
+              <div className={`flex items-center gap-2 px-5 py-2 rounded-full border ${isSport ? 'border-red-900/30 bg-red-950/20' : 'border-rose-200 bg-rose-50'}`}>
+                <span className={`w-2 h-2 rounded-full animate-pulse inline-block ${isSport ? 'bg-red-500' : 'bg-rose-500'}`}></span>
+                <span className={`text-xs font-black tracking-[0.25em] uppercase ${isSport ? 'text-red-400' : 'text-rose-600'}`}>
                   Now Spotlighting
                 </span>
-                <span className="text-xs font-bold text-rose-400">
-                  — {CATEGORY_LABELS[spotlight] || spotlight}
+                <span className={`text-xs font-bold ${isSport ? 'text-red-500/80' : 'text-rose-400'}`}>
+                  — {isSport ? (SPORT_CATEGORY_LABELS[spotlight] || spotlight) : (CATEGORY_LABELS[spotlight] || spotlight)}
                 </span>
               </div>
-              <div className="flex-1 h-px bg-gradient-to-l from-transparent to-rose-200"></div>
+              <div className={`flex-1 h-px bg-gradient-to-l from-transparent ${isSport ? 'to-red-950/40' : 'to-rose-200'}`}></div>
             </div>
 
-            {/* Featured grid — wider aspect ratio for drama */}
+            {/* Featured grid */}
             {spotlightEvents.length === 1 ? (
-              // Single event: full-width featured
               <div className="max-w-3xl mx-auto">
                 <EventCard event={spotlightEvents[0]} size="featured" />
               </div>
@@ -252,7 +262,6 @@ export default function Portfolio({ theme }) {
                 {spotlightEvents.map((ev, i) => <EventCard key={i} event={ev} size="featured" />)}
               </div>
             ) : (
-              // 3+ events: first one is large, rest in 2-col
               <div className="space-y-8">
                 <div className="max-w-3xl mx-auto">
                   <EventCard event={spotlightEvents[0]} size="featured" />
@@ -268,27 +277,39 @@ export default function Portfolio({ theme }) {
         {/* ── BROWSE ALL WORKS ── */}
         <div>
           <div className="flex items-center gap-4 mb-8">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent to-slate-200"></div>
-            <span className="text-xs font-black tracking-[0.25em] uppercase text-slate-400 px-4">Browse All Works</span>
-            <div className="flex-1 h-px bg-gradient-to-l from-transparent to-slate-200"></div>
+            <div className={`flex-1 h-px bg-gradient-to-r from-transparent ${isSport ? 'to-red-950/30' : 'to-slate-200'}`}></div>
+            <span className={`text-xs font-black tracking-[0.25em] uppercase px-4 ${isSport ? 'text-gray-500' : 'text-slate-400'}`}>
+              Browse All Works
+            </span>
+            <div className={`flex-1 h-px bg-gradient-to-l from-transparent ${isSport ? 'to-red-950/30' : 'to-slate-200'}`}></div>
           </div>
 
-          {/* Filter tabs — only show if there are multiple categories */}
+          {/* Filter tabs */}
           {displayCategories.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-8 justify-center">
               <button
+                type="button"
                 onClick={() => setActiveTab('all')}
-                className={`px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all ${activeTab === 'all' ? 'bg-slate-900 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                className={`px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all ${
+                  activeTab === 'all' 
+                    ? (isSport ? 'bg-red-600 text-white shadow-md' : 'bg-slate-900 text-white shadow-md') 
+                    : (isSport ? 'bg-slate-900/60 text-gray-400 hover:bg-slate-800' : 'bg-slate-100 text-slate-600 hover:bg-slate-200')
+                }`}
               >
                 All
               </button>
               {displayCategories.map(cat => (
                 <button
                   key={cat}
+                  type="button"
                   onClick={() => setActiveTab(cat)}
-                  className={`px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all ${activeTab === cat ? 'bg-slate-900 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                  className={`px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase transition-all ${
+                    activeTab === cat 
+                      ? (isSport ? 'bg-red-600 text-white shadow-md' : 'bg-slate-900 text-white shadow-md') 
+                      : (isSport ? 'bg-slate-900/60 text-gray-400 hover:bg-slate-800' : 'bg-slate-100 text-slate-600 hover:bg-slate-200')
+                  }`}
                 >
-                  {CATEGORY_LABELS[cat] || cat}
+                  {isSport ? (SPORT_CATEGORY_LABELS[cat] || cat) : (CATEGORY_LABELS[cat] || cat)}
                 </button>
               ))}
             </div>
@@ -296,12 +317,12 @@ export default function Portfolio({ theme }) {
 
           {filteredEvents.length === 0 ? (
             <div className="text-center py-16 text-slate-400">
-              <p className="text-lg font-serif italic">No events in this category yet.</p>
+              <p className={`text-lg italic ${isSport ? 'text-gray-500' : 'font-serif'}`}>No events in this category yet.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-12">
               {filteredEvents.map((event, idx) => (
-                <EventCard key={`portrait-${event.id || idx}`} event={event} />
+                <EventCard key={`${theme}-${event.id || idx}`} event={event} />
               ))}
             </div>
           )}

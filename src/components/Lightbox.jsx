@@ -13,11 +13,11 @@ export default function Lightbox({ isOpen, event, theme, onClose }) {
           This guarantees z-index is evaluated at root level (NOT inside backdrop's stacking context). */}
       <button
         style={{ position: 'fixed', top: '24px', right: '24px', zIndex: 10001 }}
-        className="text-white hover:text-red-500 transition-colors duration-200 w-14 h-14 flex items-center justify-center bg-black/80 hover:bg-red-600 rounded-full border-2 border-white/40 shadow-2xl"
+        className="text-white transition-all duration-300 ease-in-out w-14 h-14 flex items-center justify-center bg-black/60 hover:bg-red-600 hover:scale-110 hover:rotate-90 rounded-full border border-white/30 hover:border-red-500 shadow-2xl cursor-pointer"
         onClick={onClose}
         aria-label="Tutup lightbox"
       >
-        <X size={32} strokeWidth={3} />
+        <X size={28} strokeWidth={2.5} />
       </button>
 
       {/* Backdrop + content */}
