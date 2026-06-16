@@ -57,7 +57,7 @@ export default function Navbar({ theme }) {
                 <img 
                   id="logo-img" 
                   src={logoUrl} 
-                  alt={isSport ? "VeloLens" : "MRF Portrait"} 
+                  alt={isSport ? "VeloLens" : "Falguni Portrait"} 
                   className={`h-12 md:h-16 transition-all duration-700 object-contain ${isSport ? 'invert drop-shadow-[0_2px_4px_rgba(255,255,255,0.2)]' : 'drop-shadow-[0_1px_2px_rgba(0,0,0,0.1)]'}`}
                 />
               )

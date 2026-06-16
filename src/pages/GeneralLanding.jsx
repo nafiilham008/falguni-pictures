@@ -99,7 +99,7 @@ export default function GeneralLanding() {
           <div className="absolute inset-0 z-0">
             <img 
               src={coverPortrait} 
-              alt="MRF Portrait" 
+              alt="Falguni Portrait" 
               className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 brightness-[0.4] group-hover:brightness-[0.45]"
             />
             {/* Soft Warm gradient overlay */}
@@ -112,7 +112,7 @@ export default function GeneralLanding() {
               Elegant Fine-Art
             </span>
             <h2 className="text-3xl md:text-4xl font-serif italic text-white mb-2 drop-shadow-lg">
-              MRF Portrait
+              Falguni Portrait
             </h2>
             <p className="text-gray-300 text-sm md:text-base mb-6 font-light leading-relaxed max-w-md">
               Elegant wedding, warm graduation, and beautiful editorial engagement sessions tailored for timeless memories.

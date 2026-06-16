@@ -708,9 +708,9 @@ export default function Settings() {
                   <div className="bg-slate-50 p-6 rounded-2xl border border-gray-100 space-y-4">
                     <h4 className="font-bold text-slate-800 text-sm">Visuals & Branding</h4>
                     <VisualImageRow label="Profile Photo / Avatar" settingKey="landing_avatar" />
-                    <VisualImageRow label="MRF Portrait Card Cover" settingKey="landing_cover_portrait" />
+                    <VisualImageRow label="Falguni (Portrait) Card Cover" settingKey="landing_cover_portrait" />
                     <VisualImageRow label="VeloLens (Sport) Card Cover" settingKey="landing_cover_sport" />
-                    <VisualImageRow label="MRF Portrait Custom Logo" settingKey="logo_portrait" />
+                    <VisualImageRow label="Falguni Portrait Custom Logo" settingKey="logo_portrait" />
                     <VisualImageRow label="VeloLens Sport Custom Logo" settingKey="logo_sport" />
                   </div>
                 </div>

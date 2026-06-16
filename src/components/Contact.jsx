@@ -105,14 +105,14 @@ export default function Contact({ theme }) {
         'Thank you for choosing VeloLens to capture your sport moments! \uD83D\uDD25\uD83C\uDFAC';
     } else {
       waText =
-        '-----------------\nBOOKING FORM - MRF Portrait \uD83D\uDCF8\u2728\n-----------------\n\n' +
+        '-----------------\nBOOKING FORM - Falguni Portrait \uD83D\uDCF8\u2728\n-----------------\n\n' +
         'Full Name: ' + formData.name + '\n' +
         'Location / Venue: ' + (formData.location || '-') + '\n' +
         'Session Date: ' + dateFormatted + '\n' +
         'Theme / Reference: ' + (formData.themeRef || '-') + '\n' +
         'Selected Package: ' + formData.event + '\n' +
         'Instagram: ' + (formData.instagram ? '@' + formData.instagram.replace('@','') : '-') + '\n\n' +
-        'Thank you for trusting MRF Portrait to capture your special moments! \uD83D\uDC90\uD83C\uDF93';
+        'Thank you for trusting Falguni Portrait to capture your special graduation moments! \uD83D\uDC90\uD83C\uDF93';
     }
 
     const encodedText = encodeURIComponent(waText);
